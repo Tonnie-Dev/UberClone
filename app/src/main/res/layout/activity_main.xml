@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/uber" />
 
-    <Switch
+    <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/switch1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,13 +29,15 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/loginButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="128dp"
+        style="@style/TextAppearance.MaterialComponents.Headline6"
         android:layout_marginEnd="128dp"
         android:layout_marginBottom="150dp"
         android:text="@string/login_button_text"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -46,6 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
         android:text="@string/rider"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/switch1"
         app:layout_constraintStart_toStartOf="parent" />
@@ -55,6 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="104dp"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
         android:text="@string/driver"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/switch1"
