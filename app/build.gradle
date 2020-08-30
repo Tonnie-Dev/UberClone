@@ -21,13 +21,13 @@ android {
     }
 
 
-     buildFeatures {
-             //for data binding - default is false
-             dataBinding = true
+    buildFeatures {
+        //for data binding - default is false
+        dataBinding = true
 
-             //for vieBinding - default is true
-             viewBinding = true
-         }
+        //for vieBinding - default is true
+        viewBinding = true
+    }
 
     buildTypes {
         release {
@@ -52,30 +52,30 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
 
-     //dependencies for navigation-fragment-ktx and navigation-ui-ktx
-         implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-         implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    //dependencies for navigation-fragment-ktx and navigation-ui-ktx
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
-     implementation  'com.jakewharton.timber:timber:4.7.1'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
 
     //Data Binding
-        implementation 'androidx.databinding:databinding-common:4.2.0-alpha08'
+    implementation 'androidx.databinding:databinding-common:4.2.0-alpha08'
 
-     //Material Design Components
-         implementation 'com.google.android.material:material:1.3.0-alpha02'
+    //Material Design Components
+    implementation 'com.google.android.material:material:1.3.0-alpha02'
 
 
-     // Google
-         implementation 'com.google.android.gms:play-services-auth:18.1.0'
+    // Google
+    implementation 'com.google.android.gms:play-services-auth:18.1.0'
 
-         // Firebase
-         implementation platform('com.google.firebase:firebase-bom:25.7.0')
-         implementation 'com.google.firebase:firebase-database'
-         implementation 'com.google.firebase:firebase-storage'
-         implementation 'com.google.firebase:firebase-auth'
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:25.7.0')
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.google.firebase:firebase-auth'
 
-         // Firebase UI
-         implementation 'com.firebaseui:firebase-ui-database:6.3.0'
+    // Firebase UI
+    implementation 'com.firebaseui:firebase-ui-database:6.3.0'
 
 }
