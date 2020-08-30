@@ -1,67 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_host_fragment"
+    android:name="androidx.navigation.fragment.NavHostFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:defaultNavHost="true"
+    app:navGraph="@navigation/nav_graph"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="198dp"
-        android:layout_height="190dp"
-        android:layout_marginTop="64dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/uber" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switch1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toStartOf="@+id/driverTextView"
-        app:layout_constraintStart_toEndOf="@+id/riderTextView"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="128dp"
-        style="@style/TextAppearance.MaterialComponents.Headline6"
-        android:layout_marginEnd="128dp"
-        android:layout_marginBottom="150dp"
-        android:text="@string/login_button_text"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/riderTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
-        android:text="@string/rider"
-        style="@style/TextAppearance.MaterialComponents.Headline5"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/switch1"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/driverTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="104dp"
-        style="@style/TextAppearance.MaterialComponents.Headline5"
-        android:text="@string/driver"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/switch1"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</fragment>
