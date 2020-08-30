@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -54,21 +54,21 @@
 
         <TextView
             android:id="@+id/riderTextView"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="100dp"
             android:text="@string/rider"
-            style="@style/TextAppearance.MaterialComponents.Headline5"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/switch1"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/driverTextView"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="104dp"
-            style="@style/TextAppearance.MaterialComponents.Headline5"
             android:text="@string/driver"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/switch1"
