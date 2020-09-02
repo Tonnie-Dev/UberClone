@@ -24,12 +24,12 @@ private val reqPerm = registerForActivityResult(ActivityResultContracts.RequestP
 
     if (it){
 
-        Timber.i("Location Permission Granted")
+        Timber.i("Location Permission Granted - Rider")
     }
     else{
 
 
-        Timber.i("Location Permission Denied")
+        Timber.i("Location Permission Denied - Rider")
     }
 
 }
