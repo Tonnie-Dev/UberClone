@@ -9,5 +9,22 @@
         android:id="@+id/loginFragment"
         android:name="com.androidshowtime.uberclone.LoginFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_riderFragment"
+            app:destination="@id/riderFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_driverFragment"
+            app:destination="@id/driverFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/riderFragment"
+        android:name="com.androidshowtime.uberclone.RiderFragment"
+        android:label="fragment_rider"
+        tools:layout="@layout/fragment_rider" />
+    <fragment
+        android:id="@+id/driverFragment"
+        android:name="com.androidshowtime.uberclone.DriverFragment"
+        android:label="fragment_driver"
+        tools:layout="@layout/fragment_driver" />
 </navigation>
