@@ -48,6 +48,16 @@ class LoginFragment : Fragment() {
             val userMap = mapOf("User Type" to userType)
             db.reference.child("Users").child(currentUser.uid).setValue(userMap)
 
+
+            when(userType){
+
+                "Rider" -> {}
+                "Driver" -> {}
+
+
+
+
+            }
         }
 
 

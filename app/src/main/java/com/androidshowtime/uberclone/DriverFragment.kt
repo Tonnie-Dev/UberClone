@@ -14,7 +14,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
-class MapsFragment : Fragment() {
+class DriverFragment : Fragment() {
 
     private val callback = OnMapReadyCallback { googleMap ->
         /**
@@ -36,7 +36,7 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_maps, container, false)
+        return inflater.inflate(R.layout.fragment_driver, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
