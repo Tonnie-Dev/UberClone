@@ -9,15 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.androidshowtime.uberclone.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import timber.log.Timber
 
 
 class LoginFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
-
-
-
+    private lateinit var db: FirebaseDatabase
 
 
     override fun onCreateView(
@@ -27,13 +29,46 @@ class LoginFragment : Fragment() {
 
         val binding = FragmentLoginBinding.inflate(inflater)
         auth = FirebaseAuth.getInstance()
+        db = FirebaseDatabase.getInstance()
         signInAnonymously()
 
-
+//hide actionBar
         (activity as AppCompatActivity).supportActionBar?.hide()
 
 
-        Timber.i("Switch Value:, ${binding.switch1.isChecked}")
+
+
+        //button onClickListener
+        binding.loginButton.setOnClickListener {
+            //set the user type as rider by default
+            var userType = "Rider"
+            if (binding.switch1.isChecked) {
+
+                userType = "Driver"
+            }
+
+        }
+
+        //obtain reference to Database
+
+        val ref  = db.reference.child("Users")
+        ref.setValue(userType)
+
+       /* ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                //Failed to read value
+
+                Timber.i("Failed to read value: $error")
+            }
+        })*/
+
+
+
+
         return binding.root
     }
 
