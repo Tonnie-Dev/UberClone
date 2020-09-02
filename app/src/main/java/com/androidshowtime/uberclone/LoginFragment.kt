@@ -9,10 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.androidshowtime.uberclone.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import timber.log.Timber
 
 
@@ -36,8 +33,6 @@ class LoginFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.hide()
 
 
-
-
         //button onClickListener
         binding.loginButton.setOnClickListener {
             //set the user type as rider by default
@@ -46,25 +41,27 @@ class LoginFragment : Fragment() {
 
                 userType = "Driver"
             }
+//obtain reference to Database
+            val currentUser = auth.currentUser!!
+
+
+            val userMap = mapOf("User Type" to userType)
+            db.reference.child("Users").child(currentUser.uid).setValue(userMap)
 
         }
 
-        //obtain reference to Database
 
-        val ref  = db.reference.child("Users")
-        ref.setValue(userType)
+        /* ref.addValueEventListener(object : ValueEventListener {
+             override fun onDataChange(snapshot: DataSnapshot) {
 
-       /* ref.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
+             }
 
-            }
+             override fun onCancelled(error: DatabaseError) {
+                 //Failed to read value
 
-            override fun onCancelled(error: DatabaseError) {
-                //Failed to read value
-
-                Timber.i("Failed to read value: $error")
-            }
-        })*/
+                 Timber.i("Failed to read value: $error")
+             }
+         })*/
 
 
 
