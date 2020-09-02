@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -13,6 +14,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import timber.log.Timber
 
 class DriverFragment : Fragment() {
 
@@ -29,6 +31,17 @@ class DriverFragment : Fragment() {
         val sydney = LatLng(-34.0, 151.0)
         googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+    }
+
+    private val reqPerm = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+
+        if (it){
+
+            Timber.i("Location Permission Granted - Driver")
+
+        }else{
+            Timber.i("Location Permission Denied - Driver")}
+
     }
 
     override fun onCreateView(
