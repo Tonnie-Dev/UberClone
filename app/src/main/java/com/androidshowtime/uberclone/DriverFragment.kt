@@ -32,7 +32,7 @@ class DriverFragment : Fragment() {
         googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
-
+    // Single Permission Contract
     private val reqPerm = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
 
         if (it){
