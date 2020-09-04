@@ -64,6 +64,9 @@ class RiderFragment : Fragment() {
                 Timber.i(
                     "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}")
 
+   //clear map before setting the marker
+                
+map.clear()
                 //obtain currentLatLng from the currentLocation
                 val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
                 map.addMarker(MarkerOptions().position(currentLatLng)
