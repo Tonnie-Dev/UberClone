@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -19,7 +20,10 @@ import com.google.android.gms.maps.model.MarkerOptions
 import timber.log.Timber
 
 class RiderFragment : Fragment() {
-    private lateinit var lastKnownLocation: LatLng
+
+    private lateinit var map: GoogleMap
+
+
     private lateinit var currentLocation: Location
 
     // Single Permission Contract
@@ -34,23 +38,14 @@ class RiderFragment : Fragment() {
         }
         else {
             Toast.makeText(activity, "Location Permission Needed",
-                           Toast.LENGTH_SHORT).show()
+                           Toast.LENGTH_SHORT)
+                    .show()
         }
 
-<<<<<<< HEAD
-        Timber.i("Location Permission Granted - Rider")
-||||||| ab492bb
-        Timber.i("Location Permission Granted")
-=======
->>>>>>> locationupdates
+
     }
 
 
-<<<<<<< HEAD
-        Timber.i("Location Permission Denied - Rider")
-||||||| ab492bb
-        Timber.i("Location Permission Denied")
-=======
     //components for locations request
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
@@ -68,6 +63,13 @@ class RiderFragment : Fragment() {
                 currentLocation = locationResult.lastLocation
                 Timber.i(
                     "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}")
+
+                //obtain currentLatLng from the currentLocation
+                val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
+                map.addMarker(MarkerOptions().position(currentLatLng)
+                                      .title("Your Location"))
+                map.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
+
             }
             else {
 
@@ -78,18 +80,17 @@ class RiderFragment : Fragment() {
         }
 
 
->>>>>>> locationupdates
     }
 
+    private val callback = OnMapReadyCallback {
+        //val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
+        /* map.addMarker(MarkerOptions().position(getLastKnownLocation())
+                                     .title("Your Location"))
+         map.moveCamera(CameraUpdateFactory.newLatLng(getLastKnownLocation()))*/
 
-    private val callback = OnMapReadyCallback { googleMap ->
-        val sydney = LatLng(-34.0, 151.0)
-        googleMap.addMarker(MarkerOptions().position(sydney)
-                                    .title("Marker in Sydney"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-
-
+        map = it
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -125,7 +126,7 @@ class RiderFragment : Fragment() {
     //request permission
     @SuppressLint("MissingPermission")
     fun getLastKnownLocation(): LatLng {
-
+        var myLastKnownLocation = LatLng(0.0, 0.0)
         //lastLocation returns a task object
         fusedLocationProviderClient.lastLocation.apply {
             addOnSuccessListener {
@@ -136,7 +137,7 @@ class RiderFragment : Fragment() {
                     //retrieving values from Location
                     val myLat = it.latitude
                     val myLng = it.longitude
-                    lastKnownLocation = LatLng(myLat, myLng)
+                    myLastKnownLocation = LatLng(myLat, myLng)
                 }
             }
 
@@ -145,7 +146,7 @@ class RiderFragment : Fragment() {
             }
 
         }
-        return lastKnownLocation
+        return myLastKnownLocation
 
     }
 
