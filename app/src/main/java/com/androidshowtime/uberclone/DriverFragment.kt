@@ -13,7 +13,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -22,13 +21,18 @@ import timber.log.Timber
 
 class DriverFragment : Fragment() {
 
+    
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
 
     private val locationCallback = object : LocationCallback(){
-        override fun onLocationResult(p0: LocationResult?) {
-            super.onLocationResult(p0)
+        override fun onLocationResult(locationResult: LocationResult?) {
+            super.onLocationResult(locationResult)
+
+            if (locationResult != null) {
+
+            }
         }
 
     }
