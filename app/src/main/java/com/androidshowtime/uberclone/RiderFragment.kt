@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.*
@@ -23,20 +24,18 @@ class RiderFragment : Fragment() {
 
     // Single Permission Contract
     @SuppressLint("MissingPermission")
-    val reqPerm = registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
+    val reqPerm = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
 
-        if (result) {
-
+        if (it) {
             Timber.i("Location Permission Granted")
-            startLocationUpdates()
 
+            //request for Location Updates
+            startLocationUpdates()
         }
         else {
-
-
-            Timber.i("Location Permission Denied")
+            Toast.makeText(activity, "Location Permission Needed",
+                           Toast.LENGTH_SHORT).show()
         }
-
 
     }
 
@@ -99,7 +98,7 @@ class RiderFragment : Fragment() {
             fastestInterval = 5000
         }
 
-        
+
         return inflater.inflate(R.layout.fragment_rider, container, false)
     }
 
@@ -140,12 +139,11 @@ class RiderFragment : Fragment() {
 
 
     //start Location Updates
-
-
-    fun startLocationUpdates() {
+    private fun startLocationUpdates() {
         try {
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback,
-                                                               Looper.getMainLooper())
+            fusedLocationProviderClient.requestLocationUpdates(
+                locationRequest, locationCallback,
+                Looper.getMainLooper())
         }
         catch (e: SecurityException) {
             //Create a function to request necessary permissions from the app.
@@ -153,5 +151,10 @@ class RiderFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
 
 }
