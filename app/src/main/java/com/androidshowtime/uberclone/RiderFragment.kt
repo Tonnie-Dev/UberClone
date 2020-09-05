@@ -63,16 +63,7 @@ class RiderFragment : Fragment() {
                 currentLocation = locationResult.lastLocation
                 Timber.i(
                     "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}")
-
-   //clear map before setting the marker
-                
-map.clear()
-                //obtain currentLatLng from the currentLocation
-                val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
-                map.addMarker(MarkerOptions().position(currentLatLng)
-                                      .title("Your Location"))
-                map.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
-
+moveMarkerAndCamera(currentLocation)
             }
             else {
 
@@ -86,11 +77,7 @@ map.clear()
     }
 
     private val callback = OnMapReadyCallback {
-        //val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
-        /* map.addMarker(MarkerOptions().position(getLastKnownLocation())
-                                     .title("Your Location"))
-         map.moveCamera(CameraUpdateFactory.newLatLng(getLastKnownLocation()))*/
-
+      //initialize map
         map = it
     }
 
@@ -171,6 +158,18 @@ map.clear()
         super.onStop()
 
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+
+    fun moveMarkerAndCamera(location:Location) {
+        //clear map before setting the marker
+
+        map.clear()
+        //obtain currentLatLng from the currentLocation
+        val currentLatLng = LatLng(location.latitude, location.longitude)
+        map.addMarker(MarkerOptions().position(currentLatLng)
+                              .title("Your Location"))
+        map.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
     }
 
 }
