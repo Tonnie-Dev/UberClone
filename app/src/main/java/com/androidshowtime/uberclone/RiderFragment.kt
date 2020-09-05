@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -63,7 +65,7 @@ class RiderFragment : Fragment() {
                 currentLocation = locationResult.lastLocation
                 Timber.i(
                     "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}")
-moveMarkerAndCamera(currentLocation)
+                moveMarkerAndCamera(currentLocation)
             }
             else {
 
@@ -77,8 +79,12 @@ moveMarkerAndCamera(currentLocation)
     }
 
     private val callback = OnMapReadyCallback {
-      //initialize map
+        //initialize map
         map = it
+
+        //requestPermission
+        //request Permission
+        reqPerm.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
 
@@ -88,21 +94,32 @@ moveMarkerAndCamera(currentLocation)
         savedInstanceState: Bundle?
                              ): View? {
 
-        //request Permission
-        reqPerm.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        val binding = FragmentRiderBinding.inflate(inflater)
+        val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
+        binding.viewModel = viewModel
         //initializing the fusedLocationProviderClient
         fusedLocationProviderClient =
                 LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        //initializing locationRequest
         locationRequest = LocationRequest().apply {
 
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             interval = 0
-           // fastestInterval = 5000
+            // fastestInterval = 5000
         }
 
 
-        return inflater.inflate(R.layout.fragment_rider, container, false)
+
+        binding.callUberButton.setOnClickListener {
+
+
+            Toast.makeText(activity, "Button Clicked", Toast.LENGTH_SHORT)
+                    .show()
+        }
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -160,8 +177,8 @@ moveMarkerAndCamera(currentLocation)
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
-//move camera arount
-    fun moveMarkerAndCamera(location:Location) {
+    //move camera arount
+    fun moveMarkerAndCamera(location: Location) {
         //clear map before setting the marker
 
         map.clear()
@@ -169,10 +186,10 @@ moveMarkerAndCamera(currentLocation)
         val currentLatLng = LatLng(location.latitude, location.longitude)
         map.addMarker(MarkerOptions().position(currentLatLng)
                               .title("Your Location"))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,5f))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 5f))
     }
 
 
-    fun onCallUberButtonClick(view:View){}
+
 
 }
