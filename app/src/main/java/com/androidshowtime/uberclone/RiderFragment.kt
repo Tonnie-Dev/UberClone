@@ -169,7 +169,7 @@ moveMarkerAndCamera(currentLocation)
         val currentLatLng = LatLng(location.latitude, location.longitude)
         map.addMarker(MarkerOptions().position(currentLatLng)
                               .title("Your Location"))
-        map.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,5f))
     }
 
 }

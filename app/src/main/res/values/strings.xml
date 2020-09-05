@@ -5,10 +5,7 @@
     <string name="rider">Rider</string>
     <string name="driver">Driver</string>
     <string name="login_button_text">GET STARTED</string>
-
-
-
-
+    <string name="riderButtonText">Call Uber</string>
 
 
 </resources>
