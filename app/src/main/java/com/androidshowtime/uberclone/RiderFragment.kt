@@ -97,8 +97,8 @@ moveMarkerAndCamera(currentLocation)
 
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 3000
-            fastestInterval = 5000
+            interval = 0
+           // fastestInterval = 5000
         }
 
 
@@ -160,7 +160,7 @@ moveMarkerAndCamera(currentLocation)
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
-
+//move camera arount
     fun moveMarkerAndCamera(location:Location) {
         //clear map before setting the marker
 
