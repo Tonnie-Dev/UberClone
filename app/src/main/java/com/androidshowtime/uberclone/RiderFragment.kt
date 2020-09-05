@@ -172,4 +172,7 @@ moveMarkerAndCamera(currentLocation)
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,5f))
     }
 
+
+    fun onCallUberButtonClick(view:View){}
+
 }
