@@ -1,7 +1,6 @@
 package com.androidshowtime.uberclone
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,30 +11,33 @@ import androidx.navigation.fragment.findNavController
 import com.androidshowtime.uberclone.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
 
 
 class LoginFragment : Fragment() {
-
+    //declaring firebase components
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseDatabase
-
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
+                             ): View? {
+        val binding = FragmentLoginBinding.inflate(inflater)
         auth = FirebaseAuth.getInstance()
         signInAnonymously()
-//obtain reference to Database
 
-        val binding = FragmentLoginBinding.inflate(inflater)
 
+        //obtain reference to Database
         db = FirebaseDatabase.getInstance()
 
+        //obtain reference to Firestore
+        firestore = FirebaseFirestore.getInstance()
 
-//hide actionBar
+
+        //hide actionBar
         (activity as AppCompatActivity).supportActionBar?.hide()
 
         val currentUser = auth.currentUser
@@ -43,7 +45,7 @@ class LoginFragment : Fragment() {
         if (currentUser != null) {
             Timber.i("the user is ${currentUser.uid}")
         }
-        else{
+        else {
 
             Timber.i("user is null null")
         }
@@ -56,45 +58,51 @@ class LoginFragment : Fragment() {
                 userType = "Driver"
             }
 
-
-
-            val userMap = mapOf("User Type" to userType)
+            // create a new user with usertype for Realtime Dabase
+            val userMapRTD = mapOf("User Type" to userType)
             if (currentUser != null) {
-                db.reference.child("Users").child(currentUser.uid).setValue(userMap)
+                db.reference.child("Users")
+                        .child(currentUser.uid)
+                        .setValue(userMapRTD)
             }
 
+            // create a new user with usertype for Firestore
+            val userMapCF = mapOf("User Type" to userType)
 
-            when(userType){
+            // Add a new document with a generated ID
+            firestore.collection("users")
+                    .add(userMapCF)
+                    .addOnSuccessListener {
+
+                        Timber.i("DocumentSnapshot added with ID ${it.id}")
+                    }
+                    .addOnFailureListener {
+
+                        Timber.i("Error Encountered - $it")
+                    }
+
+
+            when (userType) {
 
                 "Rider" -> {
 
 
-                    findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRiderFragment()) }
+                    findNavController().navigate(
+                        LoginFragmentDirections.actionLoginFragmentToRiderFragment())
+                }
                 "Driver" -> {
 
 
-                    findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToDriverFragment())
+                    findNavController().navigate(
+                        LoginFragmentDirections.actionLoginFragmentToDriverFragment())
 
                 }
-
-
 
 
             }
         }
 
 
-        /* ref.addValueEventListener(object : ValueEventListener {
-             override fun onDataChange(snapshot: DataSnapshot) {
-
-             }
-
-             override fun onCancelled(error: DatabaseError) {
-                 //Failed to read value
-
-                 Timber.i("Failed to read value: $error")
-             }
-         })*/
 
 
 
@@ -104,24 +112,26 @@ class LoginFragment : Fragment() {
 
 
     private fun signInAnonymously() {
-//call signInAnonymously to sign in as an anonymous user
-        auth.signInAnonymously().addOnCompleteListener {
+        //call signInAnonymously to sign in as an anonymous user
+        auth.signInAnonymously()
+                .addOnCompleteListener {
 
 
-            if (it.isSuccessful) {
+                    if (it.isSuccessful) {
 
-                Toast.makeText(activity, "Anonymous Login Successful", Toast.LENGTH_SHORT).show()
-                Timber.i("Anonymous Login Successful")
+                        Toast.makeText(activity, "Anonymous Login Successful", Toast.LENGTH_SHORT)
+                                .show()
 
-            } else {
+                    }
+                    else {
 
-                Toast.makeText(activity, "Anonymous Login Failed", Toast.LENGTH_SHORT).show()
-                Timber.i("Anonymous Login Failed")
+                        Toast.makeText(activity, "Anonymous Login Failed", Toast.LENGTH_SHORT)
+                                .show()
 
-            }
+                    }
 
 
-        }
+                }
 
     }
 
