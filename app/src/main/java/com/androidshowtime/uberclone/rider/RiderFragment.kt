@@ -1,4 +1,4 @@
-package com.androidshowtime.uberclone
+package com.androidshowtime.uberclone.rider
 
 import android.annotation.SuppressLint
 import android.location.Location
@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.androidshowtime.uberclone.MyViewModel
+import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory

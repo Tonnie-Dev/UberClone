@@ -1,4 +1,4 @@
-package com.androidshowtime.uberclone
+package com.androidshowtime.uberclone.login
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.androidshowtime.uberclone.LoginFragmentDirections
 import com.androidshowtime.uberclone.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -66,12 +67,12 @@ class LoginFragment : Fragment() {
                         .setValue(userMapRTD)
             }
 
-            // create a new user with usertype for Firestore
+            // create a new user with userType for Firestore
             val userMapCF = mapOf("User Type" to userType)
 
-            // Add a new document with a generated ID
-            firestore.collection("users")
-                    .add(userMapCF)
+            // Add a new document with an auto-generated  doc ID
+            firestore.collection("users")//collection
+                    .add(userMapCF) // document
                     .addOnSuccessListener {
 
                         Timber.i("DocumentSnapshot added with ID ${it.id}")
@@ -83,13 +84,15 @@ class LoginFragment : Fragment() {
 
 
             when (userType) {
-
+//if userType is is a rider, navigate to RiderFragment
                 "Rider" -> {
 
 
                     findNavController().navigate(
                         LoginFragmentDirections.actionLoginFragmentToRiderFragment())
                 }
+
+                //if userType is is a Driver, navigate to DriverFragment
                 "Driver" -> {
 
 
@@ -110,7 +113,7 @@ class LoginFragment : Fragment() {
         return binding.root
     }
 
-
+//sign in anonymously
     private fun signInAnonymously() {
         //call signInAnonymously to sign in as an anonymous user
         auth.signInAnonymously()
@@ -127,7 +130,6 @@ class LoginFragment : Fragment() {
 
                         Toast.makeText(activity, "Anonymous Login Failed", Toast.LENGTH_SHORT)
                                 .show()
-
                     }
 
 

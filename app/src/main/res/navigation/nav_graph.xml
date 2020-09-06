@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.androidshowtime.uberclone.LoginFragment"
+        android:name="com.androidshowtime.uberclone.login.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
@@ -19,12 +19,12 @@
     </fragment>
     <fragment
         android:id="@+id/riderFragment"
-        android:name="com.androidshowtime.uberclone.RiderFragment"
+        android:name="com.androidshowtime.uberclone.rider.RiderFragment"
         android:label="fragment_rider"
         tools:layout="@layout/fragment_rider" />
     <fragment
         android:id="@+id/driverFragment"
-        android:name="com.androidshowtime.uberclone.DriverFragment"
+        android:name="com.androidshowtime.uberclone.driver.DriverFragment"
         android:label="fragment_driver"
         tools:layout="@layout/fragment_driver" />
 </navigation>
