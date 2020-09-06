@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.MyViewModel
 import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import timber.log.Timber
 
 class RiderFragment : Fragment() {
@@ -32,6 +34,8 @@ class RiderFragment : Fragment() {
     private lateinit var currentLocation: Location
     private lateinit var userLocation:UserLocation
     private lateinit var firestoreDB:FirebaseFirestore
+    private lateinit var userType:String
+    private val args: RiderFragmentArgs by navArgs()
 
     // Single Permission Contract
     @SuppressLint("MissingPermission")
@@ -70,7 +74,13 @@ class RiderFragment : Fragment() {
                 currentLocation = locationResult.lastLocation
                 Timber.i(
                     "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}")
+
+                //positioning the camera
                 moveMarkerAndCamera(currentLocation)
+
+
+                val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
+               // userLocation = UserLocation()
             }
             else {
 
@@ -137,32 +147,7 @@ firestoreDB = FirebaseFirestore.getInstance()
     }
 
 
-    //request permission
-    @SuppressLint("MissingPermission")
-    fun getLastKnownLocation(): LatLng {
-        var myLastKnownLocation = LatLng(0.0, 0.0)
-        //lastLocation returns a task object
-        fusedLocationProviderClient.lastLocation.apply {
-            addOnSuccessListener {
 
-                //the lastLocation may be null sometimes
-                it?.let {
-
-                    //retrieving values from Location
-                    val myLat = it.latitude
-                    val myLng = it.longitude
-                    myLastKnownLocation = LatLng(myLat, myLng)
-                }
-            }
-
-            addOnFailureListener {
-                //You can show an error dialogue or a toast stating the failure
-            }
-
-        }
-        return myLastKnownLocation
-
-    }
 
 
     //start Location Updates
@@ -225,3 +210,56 @@ firestoreDB = FirebaseFirestore.getInstance()
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* //request permission
+    @SuppressLint("MissingPermission")
+    fun getLastKnownLocation(): LatLng {
+        var myLastKnownLocation = LatLng(0.0, 0.0)
+        //lastLocation returns a task object
+        fusedLocationProviderClient.lastLocation.apply {
+            addOnSuccessListener {
+
+                //the lastLocation may be null sometimes
+                it?.let {
+
+                    //retrieving values from Location
+                    val myLat = it.latitude
+                    val myLng = it.longitude
+                    myLastKnownLocation = LatLng(myLat, myLng)
+                }
+            }
+
+            addOnFailureListener {
+                //You can show an error dialogue or a toast stating the failure
+            }
+
+        }
+        return myLastKnownLocation
+
+    }*/

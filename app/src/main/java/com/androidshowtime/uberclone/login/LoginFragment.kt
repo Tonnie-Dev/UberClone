@@ -88,7 +88,7 @@ class LoginFragment : Fragment() {
 
 
                     findNavController().navigate(
-                        LoginFragmentDirections.actionLoginFragmentToRiderFragment())
+                        LoginFragmentDirections.actionLoginFragmentToRiderFragment(userType))
                 }
 
                 //if userType is is a Driver, navigate to DriverFragment
