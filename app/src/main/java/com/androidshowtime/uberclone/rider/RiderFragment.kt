@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.androidshowtime.uberclone.MyViewModel
 import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
+import com.androidshowtime.uberclone.model.UserLocation
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -21,14 +22,16 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
 
 class RiderFragment : Fragment() {
-
+    //vars
     private lateinit var map: GoogleMap
-
-
     private lateinit var currentLocation: Location
+    private lateinit var userLocation:UserLocation
+    private lateinit var firestoreDB:FirebaseFirestore
 
     // Single Permission Contract
     @SuppressLint("MissingPermission")
@@ -80,11 +83,14 @@ class RiderFragment : Fragment() {
 
     }
 
-    private val callback = OnMapReadyCallback {
-        //initialize map
+    /*onMapReadyCallBack - is triggered when the map is ready to be used
+  and provides a non-null instance of GoogleMap.*/
+
+
+    private val onMapReadyCallback = OnMapReadyCallback {
+        //initialize map to it
         map = it
 
-        //requestPermission
         //request Permission
         reqPerm.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
     }
@@ -95,7 +101,6 @@ class RiderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
                              ): View? {
-
         val binding = FragmentRiderBinding.inflate(inflater)
         val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
         binding.viewModel = viewModel
@@ -111,9 +116,9 @@ class RiderFragment : Fragment() {
             interval = 0
             // fastestInterval = 5000
         }
-
-
-
+//initializing Firestore
+firestoreDB = FirebaseFirestore.getInstance()
+//Call Uber Button implementation
         binding.callUberButton.setOnClickListener {
 
 
@@ -127,7 +132,7 @@ class RiderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
+        mapFragment?.getMapAsync(onMapReadyCallback)
 
     }
 
@@ -192,6 +197,31 @@ class RiderFragment : Fragment() {
     }
 
 
+    //save user location into Firestore Database
+
+    fun saveUserLocation() {
+
+        //null-check to ensure UserLocationObject is not null
+
+        if (userLocation != null) {
+
+            /*you can always get a reference to the user ID for the authenticated user by writint
+             this*/
+            val uid = FirebaseAuth.getInstance().uid!!
+
+            //get UserLocations Collection reference with a document from User UID
+            val locationRef = firestoreDB.collection("UserLocations").document(uid)
+
+            //add onSuccessListener to locationRef
+            locationRef.set(userLocation).addOnSuccessListener {
+                Timber.i("inserted user's locatiion into the DB \n $userLocation")
+            }.addOnFailureListener {
+
+                Timber.i("Error encountered $it")
+            }
+        }
+
+    }
 
 
 }
