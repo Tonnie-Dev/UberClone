@@ -33,7 +33,6 @@ class RiderFragment : Fragment() {
     //vars
     private lateinit var map: GoogleMap
     private lateinit var currentLocation: Location
-    private lateinit var userLocation: UserLocation
     private lateinit var firestoreDB: FirebaseFirestore
     private lateinit var userType: String
     private val args: RiderFragmentArgs by navArgs()
@@ -85,9 +84,9 @@ class RiderFragment : Fragment() {
                 val uid = FirebaseAuth.getInstance().uid!!
                 val userType = args.userType
 
-               userLocation = UserLocation(User(uid, userType),geoPoint, null)
 
-               
+
+
             }
             else {
 
