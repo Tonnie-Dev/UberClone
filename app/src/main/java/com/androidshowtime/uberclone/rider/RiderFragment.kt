@@ -27,8 +27,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
-import com.google.type.Date
 import timber.log.Timber
+import java.util.*
 
 class RiderFragment : Fragment() {
     //vars
@@ -145,7 +145,7 @@ class RiderFragment : Fragment() {
 
             val uid = FirebaseAuth.getInstance().uid!!
             val userType = args.userType
-val  userLocation = UserLocation(User(uid, userType), geoPoint,Date())
+val  userLocation = UserLocation(User(uid, userType), geoPoint, Date())
 
             //save userLocation on firestore
             firestoreDB.collection("User Location").add(userLocation)
