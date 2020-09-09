@@ -15,6 +15,7 @@ import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.MyViewModel
 import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
+import com.androidshowtime.uberclone.model.User
 import com.androidshowtime.uberclone.model.UserLocation
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -32,9 +33,9 @@ class RiderFragment : Fragment() {
     //vars
     private lateinit var map: GoogleMap
     private lateinit var currentLocation: Location
-    private lateinit var userLocation:UserLocation
-    private lateinit var firestoreDB:FirebaseFirestore
-    private lateinit var userType:String
+    private lateinit var userLocation: UserLocation
+    private lateinit var firestoreDB: FirebaseFirestore
+    private lateinit var userType: String
     private val args: RiderFragmentArgs by navArgs()
 
     // Single Permission Contract
@@ -75,12 +76,18 @@ class RiderFragment : Fragment() {
                 Timber.i(
                     "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}")
 
-                //positioning the camera
+                //positioning the camera and the marker
                 moveMarkerAndCamera(currentLocation)
 
-
+//create Firestore Geopoint variable
                 val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
-               // userLocation = UserLocation()
+
+                val uid = FirebaseAuth.getInstance().uid!!
+                val userType = args.userType
+
+               userLocation = UserLocation(User(uid, userType),geoPoint, null)
+
+                saveUserLocation()
             }
             else {
 
@@ -109,11 +116,14 @@ class RiderFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
-                             ): View? {
+        savedInstanceState: Bundle?): View? {
         val binding = FragmentRiderBinding.inflate(inflater)
         val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
         binding.viewModel = viewModel
+
+
+
+
         //initializing the fusedLocationProviderClient
         fusedLocationProviderClient =
                 LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -126,9 +136,10 @@ class RiderFragment : Fragment() {
             interval = 0
             // fastestInterval = 5000
         }
-//initializing Firestore
-firestoreDB = FirebaseFirestore.getInstance()
-//Call Uber Button implementation
+
+        //initializing Firestore
+        firestoreDB = FirebaseFirestore.getInstance()
+        //Call Uber Button implementation
         binding.callUberButton.setOnClickListener {
 
 
@@ -145,9 +156,6 @@ firestoreDB = FirebaseFirestore.getInstance()
         mapFragment?.getMapAsync(onMapReadyCallback)
 
     }
-
-
-
 
 
     //start Location Updates
@@ -169,7 +177,7 @@ firestoreDB = FirebaseFirestore.getInstance()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
-    //move camera arount
+    //move camera around
     fun moveMarkerAndCamera(location: Location) {
         //clear map before setting the marker
 
@@ -195,46 +203,24 @@ firestoreDB = FirebaseFirestore.getInstance()
             val uid = FirebaseAuth.getInstance().uid!!
 
             //get UserLocations Collection reference with a document from User UID
-            val locationRef = firestoreDB.collection("UserLocations").document(uid)
+            val locationRef = firestoreDB.collection("UserLocations")
+                    .document(uid)
 
             //add onSuccessListener to locationRef
-            locationRef.set(userLocation).addOnSuccessListener {
-                Timber.i("inserted user's locatiion into the DB \n $userLocation")
-            }.addOnFailureListener {
+            locationRef.set(userLocation)
+                    .addOnSuccessListener {
+                        Timber.i("inserted user's location into the DB \n $userLocation")
+                    }
+                    .addOnFailureListener {
 
-                Timber.i("Error encountered $it")
-            }
+                        Timber.i("Error encountered $it")
+                    }
         }
 
     }
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* //request permission

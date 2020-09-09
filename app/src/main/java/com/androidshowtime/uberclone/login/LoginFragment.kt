@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.androidshowtime.uberclone.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
@@ -20,6 +21,7 @@ class LoginFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseDatabase
     private lateinit var firestore: FirebaseFirestore
+    private lateinit var currentUser: FirebaseUser
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,7 +30,7 @@ class LoginFragment : Fragment() {
         val binding = FragmentLoginBinding.inflate(inflater)
         auth = FirebaseAuth.getInstance()
         signInAnonymously()
-
+        currentUser = auth.currentUser!!
 
         //obtain reference to Database
         db = FirebaseDatabase.getInstance()
@@ -40,15 +42,7 @@ class LoginFragment : Fragment() {
         //hide actionBar
         (activity as AppCompatActivity).supportActionBar?.hide()
 
-        val currentUser = auth.currentUser
 
-        if (currentUser != null) {
-            Timber.i("the user is ${currentUser.uid}")
-        }
-        else {
-
-            Timber.i("user is null null")
-        }
         //button onClickListener
         binding.loginButton.setOnClickListener {
             //set the user type as rider by default
@@ -60,35 +54,46 @@ class LoginFragment : Fragment() {
 
             // create a new user with usertype for Realtime Dabase
             val userMapRTD = mapOf("User Type" to userType)
-            if (currentUser != null) {
-                db.reference.child("Users")
-                        .child(currentUser.uid)
-                        .setValue(userMapRTD)
-            }
+            db.reference.child("Users")
+                .child(currentUser.uid)
+                .setValue(userMapRTD)
 
             // create a new user with userType for Firestore
             val userMapCF = mapOf("User Type" to userType)
 
             // Add a new document with an auto-generated  doc ID
-            firestore.collection("users")//collection
-                    .add(userMapCF) // document
-                    .addOnSuccessListener {
+            firestore.collection("users") //collection
+                .add(userMapCF) // document with auto ID
+                .addOnSuccessListener {
 
-                        Timber.i("DocumentSnapshot added with ID ${it.id}")
-                    }
-                    .addOnFailureListener {
+                    Timber.i("DocumentSnapshot added with ID ${it.id}")
+                }
+                .addOnFailureListener {
 
-                        Timber.i("Error Encountered - $it")
-                    }
+                    Timber.i("Error Encountered - $it")
+                }
+
+
+            firestore.collection("users") //collection
+                .document(currentUser.uid)           //document ID specified
+                .set(userMapCF).addOnSuccessListener {
+
+                    Timber.i("Document created")
+                }
+                .addOnFailureListener {
+
+                    Timber.i("Error Encountered - $it")
+                }
 
 
             when (userType) {
-//if userType is is a rider, navigate to RiderFragment
+                //if userType is is a rider, navigate to RiderFragment
                 "Rider" -> {
 
 
                     findNavController().navigate(
-                        LoginFragmentDirections.actionLoginFragmentToRiderFragment(userType))
+                        LoginFragmentDirections.actionLoginFragmentToRiderFragment(userType)
+                                                )
                 }
 
                 //if userType is is a Driver, navigate to DriverFragment
@@ -96,7 +101,8 @@ class LoginFragment : Fragment() {
 
 
                     findNavController().navigate(
-                        LoginFragmentDirections.actionLoginFragmentToDriverFragment())
+                        LoginFragmentDirections.actionLoginFragmentToDriverFragment()
+                                                )
 
                 }
 
@@ -112,27 +118,26 @@ class LoginFragment : Fragment() {
         return binding.root
     }
 
-//sign in anonymously
+    //sign in anonymously
     private fun signInAnonymously() {
         //call signInAnonymously to sign in as an anonymous user
         auth.signInAnonymously()
-                .addOnCompleteListener {
+            .addOnCompleteListener {
 
 
-                    if (it.isSuccessful) {
+                if (it.isSuccessful) {
 
-                        Toast.makeText(activity, "Anonymous Login Successful", Toast.LENGTH_SHORT)
-                                .show()
+                    Toast.makeText(activity, "Anonymous Login Successful", Toast.LENGTH_SHORT)
+                        .show()
 
-                    }
-                    else {
+                } else {
 
-                        Toast.makeText(activity, "Anonymous Login Failed", Toast.LENGTH_SHORT)
-                                .show()
-                    }
-
-
+                    Toast.makeText(activity, "Anonymous Login Failed", Toast.LENGTH_SHORT)
+                        .show()
                 }
+
+
+            }
 
     }
 
