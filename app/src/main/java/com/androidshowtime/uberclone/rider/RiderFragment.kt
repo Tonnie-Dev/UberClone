@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.type.Date
 import timber.log.Timber
 
 class RiderFragment : Fragment() {
@@ -78,11 +79,7 @@ class RiderFragment : Fragment() {
                 //positioning the camera and the marker
                 moveMarkerAndCamera(currentLocation)
 
-//create Firestore Geopoint variable
-                val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
 
-                val uid = FirebaseAuth.getInstance().uid!!
-                val userType = args.userType
 
 
 
@@ -132,16 +129,26 @@ class RiderFragment : Fragment() {
 
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 0
-            // fastestInterval = 5000
+            interval = 5000
+          fastestInterval = 3000
         }
 
         //initializing Firestore
         firestoreDB = FirebaseFirestore.getInstance()
+
+
         //Call Uber Button implementation
         binding.callUberButton.setOnClickListener {
 
+            //create Firestore Geopoint variable
+            val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
 
+            val uid = FirebaseAuth.getInstance().uid!!
+            val userType = args.userType
+val  userLocation = UserLocation(User(uid, userType), geoPoint,Date())
+
+            //save userLocation on firestore
+            firestoreDB.collection("User Location").add(userLocation)
             Toast.makeText(activity, "Button Clicked", Toast.LENGTH_SHORT)
                     .show()
         }
