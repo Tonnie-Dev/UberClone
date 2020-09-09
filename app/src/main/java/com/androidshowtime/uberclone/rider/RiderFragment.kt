@@ -223,29 +223,3 @@ class RiderFragment : Fragment() {
 }
 
 
-/* //request permission
-    @SuppressLint("MissingPermission")
-    fun getLastKnownLocation(): LatLng {
-        var myLastKnownLocation = LatLng(0.0, 0.0)
-        //lastLocation returns a task object
-        fusedLocationProviderClient.lastLocation.apply {
-            addOnSuccessListener {
-
-                //the lastLocation may be null sometimes
-                it?.let {
-
-                    //retrieving values from Location
-                    val myLat = it.latitude
-                    val myLng = it.longitude
-                    myLastKnownLocation = LatLng(myLat, myLng)
-                }
-            }
-
-            addOnFailureListener {
-                //You can show an error dialogue or a toast stating the failure
-            }
-
-        }
-        return myLastKnownLocation
-
-    }*/
