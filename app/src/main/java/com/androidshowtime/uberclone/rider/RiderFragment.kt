@@ -87,7 +87,7 @@ class RiderFragment : Fragment() {
 
                userLocation = UserLocation(User(uid, userType),geoPoint, null)
 
-                saveUserLocation()
+               
             }
             else {
 
@@ -190,34 +190,6 @@ class RiderFragment : Fragment() {
     }
 
 
-    //save user location into Firestore Database
-
-    fun saveUserLocation() {
-
-        //null-check to ensure UserLocationObject is not null
-
-        if (userLocation != null) {
-
-            /*you can always get a reference to the user ID for the authenticated user by writint
-             this*/
-            val uid = FirebaseAuth.getInstance().uid!!
-
-            //get UserLocations Collection reference with a document from User UID
-            val locationRef = firestoreDB.collection("UserLocations")
-                    .document(uid)
-
-            //add onSuccessListener to locationRef
-            locationRef.set(userLocation)
-                    .addOnSuccessListener {
-                        Timber.i("inserted user's location into the DB \n $userLocation")
-                    }
-                    .addOnFailureListener {
-
-                        Timber.i("Error encountered $it")
-                    }
-        }
-
-    }
 
 
 }
