@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.androidshowtime.uberclone.R
+import com.androidshowtime.uberclone.databinding.FragmentDriverBinding
 
 class DriverFragment : Fragment() {
 
@@ -16,7 +16,12 @@ class DriverFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
                              ): View? {
-        return inflater.inflate(R.layout.fragment_driver, container, false)
+
+
+
+
+        val binding =FragmentDriverBinding.inflate(inflater)
+        return binding.root
     }
 
 }
