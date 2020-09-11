@@ -36,6 +36,9 @@ class RiderFragment : Fragment() {
     private lateinit var currentLocation: Location
     private lateinit var firestoreDB: FirebaseFirestore
     private lateinit var userType: String
+    private var isButtonClicked = false
+
+    //vals
     private val args: RiderFragmentArgs by navArgs()
 
     // Single Permission Contract
@@ -47,11 +50,12 @@ class RiderFragment : Fragment() {
 
             //request for Location Updates
             startLocationUpdates()
-        }
-        else {
-            Toast.makeText(activity, "Location Permission Needed",
-                           Toast.LENGTH_SHORT)
-                    .show()
+        } else {
+            Toast.makeText(
+                activity, "Location Permission Needed",
+                Toast.LENGTH_SHORT
+                          )
+                .show()
         }
 
 
@@ -74,19 +78,15 @@ class RiderFragment : Fragment() {
                 //locationResult.locations.forEach { currentLocation = it }
                 currentLocation = locationResult.lastLocation
                 Timber.i(
-                    "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}")
+                    "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}"
+                        )
 
                 //positioning the camera and the marker
                 moveMarkerAndCamera(currentLocation)
 
 
-
-
-
-
-            }
-            else {
-
+            } else {
+                //log Location is null
                 Timber.i("Location is null!!!")
                 return
 
@@ -112,17 +112,16 @@ class RiderFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?): View? {
+        savedInstanceState: Bundle?
+                             ): View? {
         val binding = FragmentRiderBinding.inflate(inflater)
         val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
         binding.viewModel = viewModel
 
 
-
-
         //initializing the fusedLocationProviderClient
         fusedLocationProviderClient =
-                LocationServices.getFusedLocationProviderClient(requireActivity())
+            LocationServices.getFusedLocationProviderClient(requireActivity())
 
         //initializing locationRequest
         locationRequest = LocationRequest().apply {
@@ -130,7 +129,7 @@ class RiderFragment : Fragment() {
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             interval = 5000
-          fastestInterval = 3000
+            fastestInterval = 3000
         }
 
         //initializing Firestore
@@ -139,18 +138,26 @@ class RiderFragment : Fragment() {
 
         //Call Uber Button implementation
         binding.callUberButton.setOnClickListener {
+            if (!isButtonClicked) {
+                //create Firestore Geopoint variable from currentLocation
+                val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
 
-            //create Firestore Geopoint variable
-            val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
+                val uid = FirebaseAuth.getInstance().uid!!
+                val userType = args.userType
+                val userLocation = UserLocation(User(uid, userType), geoPoint, Date())
 
-            val uid = FirebaseAuth.getInstance().uid!!
-            val userType = args.userType
-val  userLocation = UserLocation(User(uid, userType), geoPoint, Date())
-
-            //save userLocation on firestore
-            firestoreDB.collection("User Location").add(userLocation)
-            Toast.makeText(activity, "Button Clicked", Toast.LENGTH_SHORT)
+                //save userLocation on firestore
+                firestoreDB.collection("User Location").add(userLocation)
+                Toast.makeText(activity, "Button Clicked", Toast.LENGTH_SHORT)
                     .show()
+
+                binding.callUberButton.text = getString(R.string.cancel_button_text)
+                isButtonClicked = true
+            } else {
+
+                binding.callUberButton.text = getString(R.string.riderButtonText)
+                isButtonClicked = false
+            }
         }
 
         return binding.root
@@ -169,9 +176,9 @@ val  userLocation = UserLocation(User(uid, userType), geoPoint, Date())
         try {
             fusedLocationProviderClient.requestLocationUpdates(
                 locationRequest, locationCallback,
-                Looper.getMainLooper())
-        }
-        catch (e: SecurityException) {
+                Looper.getMainLooper()
+                                                              )
+        } catch (e: SecurityException) {
             //Create a function to request necessary permissions from the app.
 
         }
@@ -190,12 +197,12 @@ val  userLocation = UserLocation(User(uid, userType), geoPoint, Date())
         map.clear()
         //obtain currentLatLng from the currentLocation
         val currentLatLng = LatLng(location.latitude, location.longitude)
-        map.addMarker(MarkerOptions().position(currentLatLng)
-                              .title("Your Location"))
+        map.addMarker(
+            MarkerOptions().position(currentLatLng)
+                .title("Your Location")
+                     )
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 5f))
     }
-
-
 
 
 }
