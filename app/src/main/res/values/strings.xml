@@ -5,8 +5,8 @@
     <string name="rider">Rider</string>
     <string name="driver">Driver</string>
     <string name="login_button_text">GET STARTED</string>
-    <string name="riderButtonText">Call Uber</string>
-    <string name="cancel_button_text">Cancel</string>
+    <string name="request_uber">Call An Uber</string>
+    <string name="cancel_uber_request">Cancel Request</string>
 
 
 </resources>

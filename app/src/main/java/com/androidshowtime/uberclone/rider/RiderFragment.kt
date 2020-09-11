@@ -34,9 +34,10 @@ class RiderFragment : Fragment() {
     //vars
     private lateinit var map: GoogleMap
     private lateinit var currentLocation: Location
-    private lateinit var firestoreDB: FirebaseFirestore
-    private lateinit var userType: String
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var currentUserId: String
     private var isButtonClicked = false
+    private lateinit var docID:String
 
     //vals
     private val args: RiderFragmentArgs by navArgs()
@@ -133,29 +134,57 @@ class RiderFragment : Fragment() {
         }
 
         //initializing Firestore
-        firestoreDB = FirebaseFirestore.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
+
+        //initialize current user
+
+
+        currentUserId = FirebaseAuth.getInstance().uid!!
 
         //Call Uber Button implementation
         binding.callUberButton.setOnClickListener {
+
+            //Uber Request
             if (!isButtonClicked) {
                 //create Firestore Geopoint variable from currentLocation
                 val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
 
-                val uid = FirebaseAuth.getInstance().uid!!
+
                 val userType = args.userType
-                val userLocation = UserLocation(User(uid, userType), geoPoint, Date())
+                val userLocation = UserLocation(User(currentUserId, userType), geoPoint, Date())
 
                 //save userLocation on firestore
-                firestoreDB.collection("User Location").add(userLocation)
-                Toast.makeText(activity, "Button Clicked", Toast.LENGTH_SHORT)
-                    .show()
+                firestore.collection("User Location")
+                    .add(userLocation)
+                    .addOnSuccessListener {
 
-                binding.callUberButton.text = getString(R.string.cancel_button_text)
+                        //get the document id for using in deleting the document
+                        docID = it.id
+                        Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
+                            .show()
+                    }.addOnFailureListener {
+
+                        Timber.i("Error in saving User's location: $it")
+                    }
+
+
+                binding.callUberButton.text = getString(R.string.cancel_uber_request)
                 isButtonClicked = true
-            } else {
+            }
+            //Uber Request Cancellation
+            else {
 
-                binding.callUberButton.text = getString(R.string.riderButtonText)
+
+                //delete document request from firestore
+                firestore.collection("User Location").document(docID).delete().addOnSuccessListener {
+
+                    Timber.i("$docID deleted")
+                    Toast.makeText(activity,"Request Cancelled", Toast.LENGTH_SHORT).show()
+                }
+
+
+                binding.callUberButton.text = getString(R.string.request_uber)
                 isButtonClicked = false
             }
         }
@@ -184,6 +213,7 @@ class RiderFragment : Fragment() {
         }
     }
 
+    //remove location updates in background
     override fun onStop() {
         super.onStop()
 
