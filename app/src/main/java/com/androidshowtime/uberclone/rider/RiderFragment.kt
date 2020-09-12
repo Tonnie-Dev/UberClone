@@ -195,7 +195,7 @@ class RiderFragment : Fragment() {
         binding.logOutButton.setOnClickListener {
 
             FirebaseAuth.getInstance().signOut()
-            findNavController().navigate(RiderFragmentDirections.ac)
+            findNavController().navigate(RiderFragmentDirections.actionRiderFragmentToLoginFragment())
         }
 
         return binding.root

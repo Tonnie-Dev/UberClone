@@ -21,7 +21,7 @@ class LoginFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseDatabase
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var currentUser: FirebaseUser
+    private var currentUser: FirebaseUser? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,7 +30,7 @@ class LoginFragment : Fragment() {
         val binding = FragmentLoginBinding.inflate(inflater)
         auth = FirebaseAuth.getInstance()
         signInAnonymously()
-        currentUser = auth.currentUser!!
+
 
         //obtain reference to Database
         db = FirebaseDatabase.getInstance()
@@ -41,7 +41,7 @@ class LoginFragment : Fragment() {
 
         //hide actionBar
         (activity as AppCompatActivity).supportActionBar?.hide()
-
+        currentUser = auth.currentUser
 
         //button onClickListener
         binding.loginButton.setOnClickListener {
@@ -54,9 +54,11 @@ class LoginFragment : Fragment() {
 
             // create a new user with usertype for Realtime Dabase
             val userMapRTD = mapOf("User Type" to userType)
-            db.reference.child("Users")
-                .child(currentUser.uid)
-                .setValue(userMapRTD)
+            currentUser?.uid?.let { it1 ->
+                db.reference.child("Users")
+                    .child(it1)
+                    .setValue(userMapRTD)
+            }
 
             // create a new user with userType for Firestore
             val userMapCF = mapOf("User Type" to userType)
@@ -74,16 +76,18 @@ class LoginFragment : Fragment() {
                 }
 
 
-            firestore.collection("users") //collection
-                .document(currentUser.uid)           //document ID specified
-                .set(userMapCF).addOnSuccessListener {
+            currentUser?.uid?.let { uid ->
+                firestore.collection("users") //collection
+                    .document(uid)           //document ID specified
+                    .set(userMapCF).addOnSuccessListener {
 
-                    Timber.i("Document created")
-                }
-                .addOnFailureListener {
+                        Timber.i("Document created")
+                    }
+                    .addOnFailureListener {
 
-                    Timber.i("Error Encountered - $it")
-                }
+                        Timber.i("Error Encountered - $it")
+                    }
+            }
 
 
             when (userType) {
