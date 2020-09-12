@@ -19,6 +19,12 @@ import timber.log.Timber
 
 class DriverFragment : Fragment() {
 
+    //vars
+    private lateinit var requestsLists: MutableList<String>
+    private lateinit var adapter: ArrayAdapter<String>
+
+
+
     //request location permission
     val requestLocationPermission = registerForActivityResult(
         ActivityResultContracts
@@ -56,9 +62,7 @@ class DriverFragment : Fragment() {
             }
         }
 
-        override fun onLocationAvailability(p0: LocationAvailability?) {
-            super.onLocationAvailability(p0)
-        }
+
     }
 
 
@@ -89,11 +93,11 @@ class DriverFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.title = "Nearby Requests"
 
 
-        val list = mutableListOf<String>("Sue", "Winnie", "Lucy")
+       requestsLists = mutableListOf()
+        requestsLists.add("Test")
 
-        val adapter = ArrayAdapter<String>(
-            requireActivity(), android.R.layout
-                .simple_list_item_1, list
+ adapter = ArrayAdapter<String>(requireActivity(), android.R.layout
+                .simple_list_item_1, requestsLists
                                           )
 
         binding.listView.adapter = adapter
