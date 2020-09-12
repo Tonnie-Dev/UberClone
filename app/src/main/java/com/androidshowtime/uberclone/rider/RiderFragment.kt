@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.MyViewModel
 import com.androidshowtime.uberclone.R
@@ -187,6 +188,14 @@ class RiderFragment : Fragment() {
                 binding.callUberButton.text = getString(R.string.request_uber)
                 isButtonClicked = false
             }
+        }
+
+
+        //log out button implementation
+        binding.logOutButton.setOnClickListener {
+
+            FirebaseAuth.getInstance().signOut()
+            findNavController().navigate(RiderFragmentDirections.ac)
         }
 
         return binding.root

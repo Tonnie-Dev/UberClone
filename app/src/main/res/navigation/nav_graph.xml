@@ -25,6 +25,9 @@
         <argument
             android:name="userType"
             app:argType="string" />
+        <action
+            android:id="@+id/action_riderFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/driverFragment"
