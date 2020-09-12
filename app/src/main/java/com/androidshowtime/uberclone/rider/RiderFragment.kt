@@ -88,7 +88,7 @@ class RiderFragment : Fragment() {
 
 
             } else {
-                //log Location is null
+                //log Location as null
                 Timber.i("Location is null!!!")
                 return
 
