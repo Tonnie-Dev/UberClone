@@ -39,7 +39,7 @@ class RiderFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var currentUserId: String
     private var isButtonClicked = false
-    private lateinit var docID:String
+   // private lateinit var docID:String
 
     //vals
     private val args: RiderFragmentArgs by navArgs()

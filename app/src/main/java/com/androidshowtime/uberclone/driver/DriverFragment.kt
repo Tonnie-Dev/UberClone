@@ -13,6 +13,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.androidshowtime.uberclone.databinding.FragmentDriverBinding
+import com.ckdroid.geofirequery.GeoQuery
+import com.ckdroid.geofirequery.model.Distance
+import com.ckdroid.geofirequery.utils.BoundingBoxUtils
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
@@ -82,8 +85,8 @@ class DriverFragment : Fragment() {
         //initialize locationRequest
         locationRequest = LocationRequest().apply {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 5000
-            fastestInterval = 3000
+            interval = 0
+            fastestInterval = 0
         }
 
 
@@ -103,9 +106,31 @@ class DriverFragment : Fragment() {
         binding.listView.adapter = adapter
 
 
+        //button click
+
+        binding.button.setOnClickListener {
+
+            //create distance refValues
+            val driverLocation = currentLocation
+            val distanceFromDriver = Distance(20.0, BoundingBoxUtils.DistanceUnit.KILOMETERS)
 
 
-       //val docRef = firestore.collection("Locations").document("DriverLocation")
+            //create geoQuery
+            val geoQuery = GeoQuery()
+                .collection("UserPujLocation").whereNearToLocation(driverLocation, distanceFromDriver)
+
+
+
+            geoQuery.addSnapshotListener{excption, addedOrModifiedDataList, removedList ->
+
+                Timber.i("Test for addedOrModifiedList - $addedOrModifiedDataList")
+            }
+
+        }
+
+
+
+
 
 
         return binding.root
