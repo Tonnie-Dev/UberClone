@@ -80,7 +80,7 @@ dependencies {
 
 
     // Firebase
-
+//NB - Don't update the firestore lib to avoid errors
     implementation 'com.google.firebase:firebase-database:19.4.0'
     implementation 'com.google.firebase:firebase-auth:19.3.2'
     implementation 'com.google.firebase:firebase-firestore:21.4.2'

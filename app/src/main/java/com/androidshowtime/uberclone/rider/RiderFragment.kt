@@ -18,6 +18,7 @@ import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
 import com.androidshowtime.uberclone.model.User
 import com.androidshowtime.uberclone.model.UserLocation
+import com.ckdroid.geofirequery.setLocation
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -156,14 +157,13 @@ class RiderFragment : Fragment() {
                 val userLocation = UserLocation(User(currentUserId, userType), geoPoint, Date())
 
                 //save userLocation on firestore
-                firestore.collection("User Location")
-                    .add(userLocation)
+                val docRef = firestore.collection("UserPujLocation").document("Punjabi")
+                  docRef.set(userLocation)
                     .addOnSuccessListener {
 
-                        //get the document id for using in deleting the document
-                        docID = it.id
-                        Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
-                            .show()
+                        //Set Location After your document created
+                        docRef.setLocation(currentLocation.latitude, currentLocation.longitude,
+                                           "location")
                     }.addOnFailureListener {
 
                         Timber.i("Error in saving User's location: $it")

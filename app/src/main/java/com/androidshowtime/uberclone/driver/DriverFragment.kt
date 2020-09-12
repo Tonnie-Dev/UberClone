@@ -22,7 +22,7 @@ class DriverFragment : Fragment() {
     //vars
     private lateinit var requestsLists: MutableList<String>
     private lateinit var adapter: ArrayAdapter<String>
-
+    private lateinit var firestore: FirebaseFirestore
 
 
     //request location permission
@@ -66,7 +66,7 @@ class DriverFragment : Fragment() {
     }
 
 
-    private lateinit var firestore: FirebaseFirestore
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
                              ): View? {
@@ -103,6 +103,9 @@ class DriverFragment : Fragment() {
         binding.listView.adapter = adapter
 
 
+
+
+       //val docRef = firestore.collection("Locations").document("DriverLocation")
 
 
         return binding.root
