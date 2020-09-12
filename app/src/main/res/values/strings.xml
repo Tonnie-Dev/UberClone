@@ -7,6 +7,7 @@
     <string name="login_button_text">GET STARTED</string>
     <string name="request_uber">Call An Uber</string>
     <string name="cancel_uber_request">Cancel Request</string>
+    <string name="log_out">Log Out</string>
 
 
 </resources>
