@@ -13,8 +13,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.androidshowtime.uberclone.databinding.FragmentDriverBinding
+import com.androidshowtime.uberclone.model.User
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
 import timber.log.Timber
 
 class DriverFragment : Fragment() {
@@ -22,7 +24,6 @@ class DriverFragment : Fragment() {
     //vars
     private lateinit var requestsLists: MutableList<String>
     private lateinit var adapter: ArrayAdapter<String>
-
 
 
     //request location permission
@@ -53,8 +54,13 @@ class DriverFragment : Fragment() {
 
             if (locationResult != null) {
 
-                locationResult.locations.forEach{currentLocation = it}
-                Timber.i("Driver's Location is: ${currentLocation.latitude}, ${currentLocation.longitude}")
+                locationResult.locations.forEach { currentLocation = it }
+                Timber.e("DIstance: ${currentLocation.distanceTo(currentLocation)}")
+
+                //   Timber.i("Driver's Location is: ${currentLocation.latitude}, ${currentLocation
+                //   .longitude}")
+
+
             } else {
                 //Log Driver's location as null
                 Timber.i("Current location is null")
@@ -93,16 +99,17 @@ class DriverFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.title = "Nearby Requests"
 
 
-       requestsLists = mutableListOf()
+        requestsLists = mutableListOf()
         requestsLists.add("Test")
 
- adapter = ArrayAdapter<String>(requireActivity(), android.R.layout
+        adapter = ArrayAdapter<String>(
+            requireActivity(), android.R.layout
                 .simple_list_item_1, requestsLists
-                                          )
+                                      )
 
         binding.listView.adapter = adapter
 
-
+        getAllRideRequests()
 
 
         return binding.root
@@ -128,6 +135,43 @@ class DriverFragment : Fragment() {
         super.onStop()
 
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+    fun getAllRideRequests() {
+
+
+        firestore.collection("User Location").get().addOnSuccessListener { result ->
+
+            for (doc in result) {
+                Timber.d("${doc.id} => ${doc.data}")
+
+                val point = doc.getGeoPoint("geoPoint")
+                val user: User = Gson().fromJson(doc.get("user").toString(),User::class.java)
+                val loc: Location = Location("")
+
+                loc.latitude = point?.latitude!!
+                loc.longitude = point?.longitude
+
+                val distance = currentLocation.distanceTo(loc)
+
+
+
+                Timber.e("User: ${user.uid } ,Distance: "+currentLocation.distanceTo(loc)
+                    .toString())
+
+                Timber.e( if(distance < 5000) "User within radius" else "user far" )
+
+
+
+
+            }
+
+
+        }.addOnFailureListener {
+
+            Timber.e(it)
+        }
+
     }
 
 }
