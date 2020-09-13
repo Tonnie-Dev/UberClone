@@ -85,8 +85,8 @@ class DriverFragment : Fragment() {
         //initialize locationRequest
         locationRequest = LocationRequest().apply {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 0
-            fastestInterval = 0
+            interval = 3000
+            fastestInterval = 1000
         }
 
 
@@ -112,19 +112,26 @@ class DriverFragment : Fragment() {
 
             //create distance refValues
             val driverLocation = currentLocation
-            val distanceFromDriver = Distance(20.0, BoundingBoxUtils.DistanceUnit.KILOMETERS)
+            val distanceFromDriver = Distance(50.0, BoundingBoxUtils.DistanceUnit.KILOMETERS)
 
 
             //create geoQuery
             val geoQuery = GeoQuery()
-                .collection("UserPujLocation").whereNearToLocation(driverLocation, distanceFromDriver)
+                .collection("UserPujLocation").whereNearToLocation(driverLocation,
+                                                                   distanceFromDriver,"location")
 
 
 
-            geoQuery.addSnapshotListener{excption, addedOrModifiedDataList, removedList ->
+           geoQuery.addSnapshotListener{excption, addedOrModifiedDataList, removedList ->
+
+}
+
+               addedOrModifiedDataList.forEach { Timber.i("$it") }
 
                 Timber.i("Test for addedOrModifiedList - $addedOrModifiedDataList")
             }
+
+
 
         }
 

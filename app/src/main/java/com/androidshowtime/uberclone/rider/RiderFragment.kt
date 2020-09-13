@@ -157,7 +157,10 @@ class RiderFragment : Fragment() {
                 val userLocation = UserLocation(User(currentUserId, userType), geoPoint, Date())
 
                 //save userLocation on firestore
-                val docRef = firestore.collection("UserPujLocation").document("Punjabi")
+                val docRef = firestore
+                    .collection("UserPujLocation")
+                    .document("Punjabi")
+
                   docRef.set(userLocation)
                     .addOnSuccessListener {
 
