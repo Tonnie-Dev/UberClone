@@ -42,5 +42,9 @@
         android:id="@+id/driverMapFragment"
         android:name="com.androidshowtime.uberclone.driver.DriverMapFragment"
         android:label="fragment_driver_map"
-        tools:layout="@layout/fragment_driver_map" />
+        tools:layout="@layout/fragment_driver_map" >
+        <argument
+            android:name="userLocation"
+            app:argType="android.location.Location" />
+    </fragment>
 </navigation>

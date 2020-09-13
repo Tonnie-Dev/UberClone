@@ -12,11 +12,10 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-
+import androidx.navigation.fragment.findNavController
 import com.androidshowtime.uberclone.databinding.FragmentDriverRequestViewBinding
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -27,7 +26,7 @@ class DriverRequestViewFragment : Fragment() {
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var firestore: FirebaseFirestore
     private lateinit var driverCurrentLocation: Location
-    private lateinit var requestGeoPoints: MutableList<GeoPoint>
+    private lateinit var requestsLocationList: MutableList<Location>
 
     //request location permission
     val requestLocationPermission = registerForActivityResult(
@@ -105,7 +104,7 @@ class DriverRequestViewFragment : Fragment() {
 
         //initialize requestList and requestGeoPoints Lists
         requestsList = mutableListOf()
-        requestGeoPoints = mutableListOf()
+        requestsLocationList = mutableListOf()
 
         //initialize Adapter
         adapter = ArrayAdapter<String>(
@@ -116,8 +115,13 @@ class DriverRequestViewFragment : Fragment() {
         binding.listView.adapter = adapter
 
         binding.listView.setOnItemClickListener { _, _, i, _ ->
+val userLocation = requestsLocationList[i]
 
-            Timber.i("The geoPoint is ${requestGeoPoints[i]}")
+            Timber.i("The location is $userLocation")
+
+            findNavController().navigate(DriverRequestViewFragmentDirections
+                                             .actionDriverRequestViewFragmentToDriverMapFragment
+                                                 (userLocation))
 
         }
 
@@ -161,14 +165,16 @@ class DriverRequestViewFragment : Fragment() {
 
                     val geoPoint = requestDocument.getGeoPoint("geoPoint")!!
                     val documentID = requestDocument.id
+                    //set userLocation latitude and longitude on Location class
+                    val userLocation = Location("")
+                    userLocation.latitude = geoPoint.latitude
+                    userLocation.longitude = geoPoint.longitude
 
 
 
 
 
-
-
-                    populateListWithRequests(documentID, geoPoint)
+                    populateListWithRequests(documentID, userLocation)
 
 
                 }
@@ -186,16 +192,16 @@ class DriverRequestViewFragment : Fragment() {
     }
 
 
-    private fun populateListWithRequests(docId: String, geoPoint: GeoPoint) {
+    private fun populateListWithRequests(docId: String, userLocation:Location) {
 
         //capture user's geoPoint and store in in a list
-        requestGeoPoints.add(geoPoint)
+        requestsLocationList.add(userLocation)
 
 
-        //set userLocation latitude and longitude on Location class
+       /*
         val userLocation = Location("")
         userLocation.latitude = geoPoint.latitude
-        userLocation.longitude = geoPoint.longitude
+        userLocation.longitude = geoPoint.longitude*/
 
 
 
