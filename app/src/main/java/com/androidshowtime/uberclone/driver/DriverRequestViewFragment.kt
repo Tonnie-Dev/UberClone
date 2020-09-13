@@ -91,8 +91,8 @@ class DriverRequestViewFragment : Fragment() {
         //initialize locationRequest
         locationRequest = LocationRequest().apply {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 3000
-            fastestInterval = 2000
+            interval = 9000
+            fastestInterval = 8000
         }
 
 
