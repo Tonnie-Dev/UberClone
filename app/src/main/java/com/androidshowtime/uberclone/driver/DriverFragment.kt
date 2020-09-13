@@ -16,6 +16,7 @@ import com.androidshowtime.uberclone.databinding.FragmentDriverBinding
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 class DriverFragment : Fragment() {
 
@@ -203,7 +204,7 @@ class DriverFragment : Fragment() {
         //filter list to include only locations <50 KM
 
         if (distance <= 50.0) {
-            requestsList.add("$docId \n $distance KM")
+            requestsList.add("$docId \n ${distance.roundToInt()} KM")
             Timber.i("List Size is after population ${requestsList.size}")
         }
 
