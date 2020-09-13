@@ -16,7 +16,6 @@ import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.MyViewModel
 import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
-import com.androidshowtime.uberclone.model.User
 import com.androidshowtime.uberclone.model.UserLocation
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -153,10 +152,10 @@ class RiderFragment : Fragment() {
 
 
                 val userType = args.userType
-                val userLocation = UserLocation(User(currentUserId, userType), geoPoint, Date())
+                val userLocation = UserLocation( geoPoint, Date())
 
                 //save userLocation on firestore
-                firestore.collection("User Location")
+                firestore.collection("UserLocation")
                     .add(userLocation)
                     .addOnSuccessListener {
 
@@ -178,7 +177,7 @@ class RiderFragment : Fragment() {
 
 
                 //delete document request from firestore
-                firestore.collection("User Location").document(docID).delete().addOnSuccessListener {
+                firestore.collection("UserLocation").document(docID).delete().addOnSuccessListener {
 
                     Timber.i("$docID deleted")
                     Toast.makeText(activity,"Request Cancelled", Toast.LENGTH_SHORT).show()
@@ -193,9 +192,10 @@ class RiderFragment : Fragment() {
 
         //log out button implementation
         binding.logOutButton.setOnClickListener {
-
-            FirebaseAuth.getInstance().signOut()
             findNavController().navigate(RiderFragmentDirections.actionRiderFragmentToLoginFragment())
+            FirebaseAuth.getInstance().signOut()
+
+
         }
 
         return binding.root

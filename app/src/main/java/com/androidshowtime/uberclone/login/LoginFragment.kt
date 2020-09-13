@@ -30,7 +30,7 @@ class LoginFragment : Fragment() {
         val binding = FragmentLoginBinding.inflate(inflater)
         auth = FirebaseAuth.getInstance()
         signInAnonymously()
-
+        currentUser = auth.currentUser
 
         //obtain reference to Database
         db = FirebaseDatabase.getInstance()
@@ -41,7 +41,7 @@ class LoginFragment : Fragment() {
 
         //hide actionBar
         (activity as AppCompatActivity).supportActionBar?.hide()
-        currentUser = auth.currentUser
+
 
         //button onClickListener
         binding.loginButton.setOnClickListener {
