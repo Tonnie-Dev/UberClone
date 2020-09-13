@@ -12,13 +12,14 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.androidshowtime.uberclone.databinding.FragmentDriverBinding
+
+import com.androidshowtime.uberclone.databinding.FragmentDriverRequestViewBinding
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
 import kotlin.math.roundToInt
 
-class DriverFragment : Fragment() {
+class DriverRequestViewFragment : Fragment() {
 
     //vars
     private lateinit var requestsList: MutableList<String>
@@ -95,7 +96,7 @@ class DriverFragment : Fragment() {
         }
 
 
-        val binding = FragmentDriverBinding.inflate(inflater)
+        val binding = FragmentDriverRequestViewBinding.inflate(inflater)
 
         (activity as AppCompatActivity).supportActionBar?.show()
         (activity as AppCompatActivity).supportActionBar?.title = "Nearby Requests"
@@ -124,7 +125,7 @@ class DriverFragment : Fragment() {
     }
 
     //startLocationUpdates() to be called once permission has been granted
-    fun startLocationUpdates() {
+    private fun startLocationUpdates() {
 
         try {
             fusedLocationProviderClient.requestLocationUpdates(
@@ -176,7 +177,6 @@ class DriverFragment : Fragment() {
                     populateListWithRequests(documentID, distance)
 
 
-
                 }
 
             }.addOnFailureListener {
@@ -184,9 +184,9 @@ class DriverFragment : Fragment() {
                 Timber.e(it)
             }
 
-       // clear list
-         requestsList.clear()
-
+        // clear list
+        requestsList.clear()
+        adapter.notifyDataSetChanged()
 
 
     }
@@ -197,8 +197,6 @@ class DriverFragment : Fragment() {
         docId: String,
         distance: Float
                                         ) {
-
-
 
 
         //filter list to include only locations <50 KM

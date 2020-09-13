@@ -15,7 +15,7 @@
             app:destination="@id/riderFragment" />
         <action
             android:id="@+id/action_loginFragment_to_driverFragment"
-            app:destination="@id/driverFragment" />
+            app:destination="@id/driverRequestViewFragment" />
     </fragment>
     <fragment
         android:id="@+id/riderFragment"
@@ -30,8 +30,8 @@
             app:destination="@id/loginFragment" />
     </fragment>
     <fragment
-        android:id="@+id/driverFragment"
-        android:name="com.androidshowtime.uberclone.driver.DriverFragment"
+        android:id="@+id/driverRequestViewFragment"
+        android:name="com.androidshowtime.uberclone.driver.DriverRequestViewFragment"
         android:label="fragment_driver"
-        tools:layout="@layout/fragment_driver" />
+        tools:layout="@layout/fragment_driver_request_view" />
 </navigation>
