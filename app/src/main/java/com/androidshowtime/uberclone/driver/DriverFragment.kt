@@ -29,10 +29,7 @@ class DriverFragment : Fragment() {
     //request location permission
     val requestLocationPermission = registerForActivityResult(
         ActivityResultContracts
-            .RequestPermission()
-                                                             ) {
-
-
+            .RequestPermission()) {
         if (it) {
 
             startLocationUpdates()
@@ -137,7 +134,7 @@ class DriverFragment : Fragment() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
-    fun getAllRideRequests() {
+    private fun getAllRideRequests() {
 
 
         firestore.collection("User Location").get().addOnSuccessListener { result ->
