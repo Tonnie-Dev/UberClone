@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import com.androidshowtime.uberclone.databinding.FragmentDriverRequestViewBinding
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -26,6 +27,7 @@ class DriverRequestViewFragment : Fragment() {
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var firestore: FirebaseFirestore
     private lateinit var driverCurrentLocation: Location
+    private lateinit var requestGeoPoints: MutableList<GeoPoint>
 
     //request location permission
     val requestLocationPermission = registerForActivityResult(
@@ -97,13 +99,13 @@ class DriverRequestViewFragment : Fragment() {
 
 
         val binding = FragmentDriverRequestViewBinding.inflate(inflater)
-
+        //add title to Action Bar
         (activity as AppCompatActivity).supportActionBar?.show()
         (activity as AppCompatActivity).supportActionBar?.title = "Nearby Requests"
 
-        //initialize requestList
+        //initialize requestList and requestGeoPoints Lists
         requestsList = mutableListOf()
-
+        requestGeoPoints = mutableListOf()
 
         //initialize Adapter
         adapter = ArrayAdapter<String>(
@@ -115,6 +117,7 @@ class DriverRequestViewFragment : Fragment() {
 
         binding.listView.setOnItemClickListener { _, _, i, _ ->
 
+            Timber.i("The geoPoint is ${requestGeoPoints[i]}")
 
         }
 
@@ -156,25 +159,16 @@ class DriverRequestViewFragment : Fragment() {
                 for (requestDocument in result) {
 
 
-                    val point = requestDocument.getGeoPoint("geoPoint")
-
-
-                    //set location latitude and longitude
-                    val loc = Location("")
-                    loc.latitude = point?.latitude!!
-                    loc.longitude = point.longitude
-
-
+                    val geoPoint = requestDocument.getGeoPoint("geoPoint")!!
                     val documentID = requestDocument.id
 
-                    //using Location class distanceTo()to calculate distance in km
-                    val distance = driverCurrentLocation.distanceTo(loc) / 1000
 
 
 
 
 
-                    populateListWithRequests(documentID, distance)
+
+                    populateListWithRequests(documentID, geoPoint)
 
 
                 }
@@ -192,22 +186,30 @@ class DriverRequestViewFragment : Fragment() {
     }
 
 
-    private fun populateListWithRequests(
+    private fun populateListWithRequests(docId: String, geoPoint: GeoPoint) {
 
-        docId: String,
-        distance: Float
-                                        ) {
+        //capture user's geoPoint and store in in a list
+        requestGeoPoints.add(geoPoint)
 
+
+        //set userLocation latitude and longitude on Location class
+        val userLocation = Location("")
+        userLocation.latitude = geoPoint.latitude
+        userLocation.longitude = geoPoint.longitude
+
+
+
+
+        //using Location class distanceTo() to calculate distance in km
+        val distance = driverCurrentLocation.distanceTo(userLocation) / 1000
 
         //filter list to include only locations <50 KM
-
         if (distance <= 50.0) {
             requestsList.add("$docId \n ${distance.roundToInt()} KM")
+            adapter.notifyDataSetChanged()
             Timber.i("List Size is after population ${requestsList.size}")
         }
 
-
-        adapter.notifyDataSetChanged()
 
     }
 

@@ -33,5 +33,14 @@
         android:id="@+id/driverRequestViewFragment"
         android:name="com.androidshowtime.uberclone.driver.DriverRequestViewFragment"
         android:label="fragment_driver"
-        tools:layout="@layout/fragment_driver_request_view" />
+        tools:layout="@layout/fragment_driver_request_view" >
+        <action
+            android:id="@+id/action_driverRequestViewFragment_to_driverMapFragment"
+            app:destination="@id/driverMapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/driverMapFragment"
+        android:name="com.androidshowtime.uberclone.driver.DriverMapFragment"
+        android:label="fragment_driver_map"
+        tools:layout="@layout/fragment_driver_map" />
 </navigation>

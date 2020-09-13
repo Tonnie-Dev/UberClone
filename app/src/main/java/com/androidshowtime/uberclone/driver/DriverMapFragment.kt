@@ -36,7 +36,7 @@ class DriverMapFragment : Fragment() {
                              ): View? {
 
 
-        upuzi 
+
         return inflater.inflate(R.layout.fragment_driver_map, container, false)
     }
 
