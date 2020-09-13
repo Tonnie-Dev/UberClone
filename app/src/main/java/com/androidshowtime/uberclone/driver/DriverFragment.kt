@@ -18,18 +18,20 @@ import com.google.android.gms.location.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 class DriverFragment : Fragment() {
 
     //vars
-    private lateinit var requestsLists: MutableList<String>
+    private lateinit var requestsList: MutableList<String>
     private lateinit var adapter: ArrayAdapter<String>
-
-
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var driverCurrentLocation: Location
     //request location permission
     val requestLocationPermission = registerForActivityResult(
         ActivityResultContracts
-            .RequestPermission()) {
+            .RequestPermission()
+                                                             ) {
         if (it) {
 
             startLocationUpdates()
@@ -41,7 +43,6 @@ class DriverFragment : Fragment() {
 
 
     //location updates components
-    private lateinit var currentLocation: Location
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private var locationCallback: LocationCallback = object : LocationCallback() {
@@ -51,11 +52,7 @@ class DriverFragment : Fragment() {
 
             if (locationResult != null) {
 
-                locationResult.locations.forEach { currentLocation = it }
-                Timber.e("DIstance: ${currentLocation.distanceTo(currentLocation)}")
-
-                //   Timber.i("Driver's Location is: ${currentLocation.latitude}, ${currentLocation
-                //   .longitude}")
+                locationResult.locations.forEach { driverCurrentLocation = it }
 
 
             } else {
@@ -69,7 +66,7 @@ class DriverFragment : Fragment() {
     }
 
 
-    private lateinit var firestore: FirebaseFirestore
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
                              ): View? {
@@ -95,13 +92,15 @@ class DriverFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.show()
         (activity as AppCompatActivity).supportActionBar?.title = "Nearby Requests"
 
+//initialize requestList
+        requestsList = mutableListOf()
 
-        requestsLists = mutableListOf()
-        requestsLists.add("Test")
 
+
+        //initialize Adapter
         adapter = ArrayAdapter<String>(
             requireActivity(), android.R.layout
-                .simple_list_item_1, requestsLists
+                .simple_list_item_1, requestsList
                                       )
 
         binding.listView.adapter = adapter
@@ -136,38 +135,52 @@ class DriverFragment : Fragment() {
 
     private fun getAllRideRequests() {
 
+        //get all request documents
+        firestore.collection("User Location")
+            .get()
+            .addOnSuccessListener { result ->
 
-        firestore.collection("User Location").get().addOnSuccessListener { result ->
-
-            for (doc in result) {
-                Timber.d("${doc.id} => ${doc.data}")
-
-                val point = doc.getGeoPoint("geoPoint")
-                val user: User = Gson().fromJson(doc.get("user").toString(),User::class.java)
-                val loc: Location = Location("")
-
-                loc.latitude = point?.latitude!!
-                loc.longitude = point?.longitude
-
-                val distance = currentLocation.distanceTo(loc)
+                for (requestDocument in result) {
 
 
+                    val point = requestDocument.getGeoPoint("geoPoint")
+                    val user: User = Gson().fromJson(requestDocument.get("user").toString(), User::class.java)
 
-                Timber.e("User: ${user.uid } ,Distance: "+currentLocation.distanceTo(loc)
-                    .toString())
+                    //set location latitude and longitude
+                    val loc = Location("")
+                    loc.latitude = point?.latitude!!
+                    loc.longitude = point.longitude
 
-                Timber.e( if(distance < 5000) "User within radius" else "user far" )
+
+                    //using Location class distanceTo()to calculate distance in km
+                    val distance = driverCurrentLocation.distanceTo(loc)/1000
 
 
 
+populateListWithRequests(requestsList, user.uid, distance)
 
+                }
+
+
+            }.addOnFailureListener {
+
+                Timber.e(it)
             }
 
+    }
 
-        }.addOnFailureListener {
 
-            Timber.e(it)
+    private fun populateListWithRequests(list:MutableList<String>, uid:String, distance:Float) {
+
+        //filter list to include only locations <50 KM
+
+        if (distance <= 50.0) {
+            list.add("$uid \n ${distance.roundToInt()} KM")
+
         }
+
+     Timber.i(list.distinct().toString())
+        adapter.notifyDataSetChanged()
 
     }
 
