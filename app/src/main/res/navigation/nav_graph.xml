@@ -46,5 +46,8 @@
         <argument
             android:name="userLocation"
             app:argType="android.location.Location" />
+        <argument
+            android:name="driverLocation"
+            app:argType="android.location.Location" />
     </fragment>
 </navigation>

@@ -121,7 +121,7 @@ val userLocation = requestsLocationList[i]
 
             findNavController().navigate(DriverRequestViewFragmentDirections
                                              .actionDriverRequestViewFragmentToDriverMapFragment
-                                                 (userLocation))
+                                                 (userLocation, driverCurrentLocation))
 
         }
 
