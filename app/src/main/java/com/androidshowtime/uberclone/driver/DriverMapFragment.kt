@@ -41,8 +41,8 @@ class DriverMapFragment : Fragment() {
         markers.add(
             map.addMarker(
                 MarkerOptions().position(riderLatLng)
-                    .title("Driver")
-                    .snippet("Driver")
+                    .title("Rider")
+                    .snippet("Rider")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))))
 
 
