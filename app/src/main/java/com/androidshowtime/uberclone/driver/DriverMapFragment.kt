@@ -13,9 +13,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import timber.log.Timber
 
 
@@ -25,17 +23,56 @@ class DriverMapFragment : Fragment() {
 
     //vars
     private lateinit var map: GoogleMap
+    private lateinit var markers: MutableList<Marker>
 
     private val callback = OnMapReadyCallback { googleMap ->
 
         map = googleMap
 
-
+        //retrieve driver and rider location from navigation arguments
         val riderLocation = args.userLocation
         val driverLocation = args.driverLocation
 
-        showDriverLocation(driverLocation)
-        showRiderLocation(riderLocation)
+        //obtain driver and rider co-ordinates
+        val riderLatLng = LatLng(riderLocation.latitude, riderLocation.longitude)
+        val driverLatLng = LatLng(driverLocation.latitude, driverLocation.longitude)
+
+
+        markers.add(
+            map.addMarker(
+                MarkerOptions().position(riderLatLng)
+                    .title("Driver")
+                    .snippet("Driver")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))))
+
+
+        markers.add(
+            map.addMarker(
+                MarkerOptions().position(driverLatLng)
+                    .title("Driver")
+                    .snippet("Driver")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))))
+
+        //create builder
+        val builder = LatLngBounds.builder()
+
+        //loop through the markes array
+        for (marker in markers) {
+
+            builder.include(marker.position)
+        }
+        //generate a bound
+        val bounds = builder.build()
+
+        //set a 200 pixels padding from the edge of the screen
+        val cu = CameraUpdateFactory.newLatLngBounds(bounds,200)
+
+        //move and animate the camera
+        map.moveCamera(cu)
+        map.animateCamera(cu)
+
+        // showDriverLocation(driverLocation)
+        //showRiderLocation(riderLocation)
     }
 
     override fun onCreateView(
@@ -43,8 +80,10 @@ class DriverMapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
                              ): View? {
+        //initialize markers list
 
-        Timber.i("The passed Geopoin is ${args.userLocation}")
+        markers = mutableListOf()
+        Timber.i("The passed Geopoint is ${args.userLocation}")
 
         return inflater.inflate(R.layout.fragment_driver_map, container, false)
     }
@@ -69,9 +108,10 @@ class DriverMapFragment : Fragment() {
         //move pointer to driver's location
         map.addMarker(
             MarkerOptions().position(latLng)
-                    .title("Driver")
-                    .snippet("Driver")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+                .title("Driver")
+                .snippet("Driver")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                     )
 
     }
 
@@ -86,9 +126,10 @@ class DriverMapFragment : Fragment() {
         //move pointer to rider's location
         map.addMarker(
             MarkerOptions().position(latLng)
-                    .title("Rider")
-                    .snippet("Rider")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))).isVisible
+                .title("Rider")
+                .snippet("Rider")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+                     ).isVisible
 
     }
 }
