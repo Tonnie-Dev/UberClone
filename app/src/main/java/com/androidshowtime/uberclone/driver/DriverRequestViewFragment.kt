@@ -27,7 +27,7 @@ class DriverRequestViewFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var driverCurrentLocation: Location
     private lateinit var requestsLocationList: MutableList<Location>
-
+private lateinit var documentID:String
     //request location permission
     val requestLocationPermission = registerForActivityResult(
         ActivityResultContracts
@@ -121,7 +121,7 @@ val userLocation = requestsLocationList[i]
 
             findNavController().navigate(DriverRequestViewFragmentDirections
                                              .actionDriverRequestViewFragmentToDriverMapFragment
-                                                 (userLocation, driverCurrentLocation))
+                                                 (userLocation, driverCurrentLocation, documentID))
 
         }
 
@@ -164,7 +164,7 @@ val userLocation = requestsLocationList[i]
 
 
                     val geoPoint = requestDocument.getGeoPoint("geoPoint")!!
-                    val documentID = requestDocument.id
+                   documentID = requestDocument.id
                     //set userLocation latitude and longitude on Location class
                     val userLocation = Location("")
                     userLocation.latitude = geoPoint.latitude
