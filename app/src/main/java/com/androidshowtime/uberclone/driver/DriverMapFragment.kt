@@ -49,6 +49,7 @@ class DriverMapFragment : Fragment() {
             map.addMarker(
                 MarkerOptions().position(riderLatLng)
                     .title("Rider")
+                    . flat(true)
                     .snippet("Rider")
                     .icon(BitmapDescriptorFactory.fromBitmap(bitmap))))
         // .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory
@@ -79,7 +80,7 @@ class DriverMapFragment : Fragment() {
         //move and animate the camera
 
         map.moveCamera(cu)
-        map.animateCamera(CameraUpdateFactory.zoomTo(10f), 3000, null)
+        map.animateCamera(CameraUpdateFactory.zoomTo(10f), 2000, null)
 
     }
 
