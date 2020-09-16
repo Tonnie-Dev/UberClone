@@ -50,7 +50,6 @@ class DriverMapFragment : Fragment() {
                 MarkerOptions().position(riderLatLng)
                     .title("Rider")
                     .snippet("Rider")
-
                     .icon(BitmapDescriptorFactory.fromBitmap(bitmap))))
         // .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory
         // .HUE_RED))))
@@ -78,9 +77,9 @@ class DriverMapFragment : Fragment() {
         val cu = CameraUpdateFactory.newLatLngBounds(bounds, 150)
 
         //move and animate the camera
-        map.animateCamera(cu)
-        map.moveCamera(cu)
 
+        map.moveCamera(cu)
+        map.animateCamera(CameraUpdateFactory.zoomTo(10f), 3000, null)
 
     }
 
