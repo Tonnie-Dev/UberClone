@@ -28,6 +28,8 @@ class DriverRequestViewFragment : Fragment() {
     private lateinit var driverCurrentLocation: Location
     private lateinit var requestsLocationList: MutableList<Location>
 private lateinit var documentID:String
+    private lateinit var  distanceList :MutableList<Int>
+    private  var riderDistanceFromDriver: Int = 0
     //request location permission
     val requestLocationPermission = registerForActivityResult(
         ActivityResultContracts
@@ -105,6 +107,7 @@ private lateinit var documentID:String
         //initialize requestList and requestGeoPoints Lists
         requestsList = mutableListOf()
         requestsLocationList = mutableListOf()
+        distanceList = mutableListOf()
 
         //initialize Adapter
         adapter = ArrayAdapter<String>(
@@ -117,11 +120,12 @@ private lateinit var documentID:String
         binding.listView.setOnItemClickListener { _, _, i, _ ->
 val userLocation = requestsLocationList[i]
 
-            Timber.i("The location is $userLocation")
+riderDistanceFromDriver = distanceList[i]
 
             findNavController().navigate(DriverRequestViewFragmentDirections
                                              .actionDriverRequestViewFragmentToDriverMapFragment
-                                                 (userLocation, driverCurrentLocation, documentID))
+                                                 (userLocation, driverCurrentLocation,
+                                                  documentID,riderDistanceFromDriver))
 
         }
 
@@ -198,13 +202,6 @@ val userLocation = requestsLocationList[i]
         requestsLocationList.add(userLocation)
 
 
-       /*
-        val userLocation = Location("")
-        userLocation.latitude = geoPoint.latitude
-        userLocation.longitude = geoPoint.longitude*/
-
-
-
 
         //using Location class distanceTo() to calculate distance in km
         val distance = driverCurrentLocation.distanceTo(userLocation) / 1000
@@ -212,6 +209,7 @@ val userLocation = requestsLocationList[i]
         //filter list to include only locations <50 KM
         if (distance <= 50.0) {
             requestsList.add("$docId \n ${distance.roundToInt()} KM")
+            distanceList.add(distance.roundToInt())
             adapter.notifyDataSetChanged()
             Timber.i("List Size is after population ${requestsList.size}")
         }

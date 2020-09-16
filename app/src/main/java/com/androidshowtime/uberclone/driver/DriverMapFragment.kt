@@ -1,9 +1,12 @@
 package com.androidshowtime.uberclone.driver
 
+
+
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +22,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import timber.log.Timber
 
 
 class DriverMapFragment : Fragment() {
@@ -30,6 +34,9 @@ class DriverMapFragment : Fragment() {
     private lateinit var markers: MutableList<Marker>
     private lateinit var riderLocation: Location
     private lateinit var driverLocation: Location
+    private var magentaPolyline: Polyline? = null
+
+
 
     private val callback = OnMapReadyCallback { googleMap ->
 
@@ -43,15 +50,25 @@ class DriverMapFragment : Fragment() {
         val riderLatLng = LatLng(riderLocation.latitude, riderLocation.longitude)
         val driverLatLng = LatLng(driverLocation.latitude, driverLocation.longitude)
         val bitmap = BitmapFactory.decodeResource(resources, R.drawable.rider)
-        val latLng = LatLng(riderLocation.latitude, riderLocation.longitude)
 
-        markers.add(
-            map.addMarker(
-                MarkerOptions().position(riderLatLng)
-                    .title("Rider")
-                    . flat(true)
-                    .snippet("Rider")
-                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap))))
+        //add snippet to show distance from the driver
+        val snippet = "${args.riderDistanceFromDriver} KM away"
+
+
+        //rider marker
+        val riderMarker = map.addMarker(
+            MarkerOptions().position(riderLatLng)
+                .title("Rider")
+                .flat(true)
+                .snippet(snippet)
+
+                .icon(BitmapDescriptorFactory.fromBitmap(bitmap)))
+
+        //show the infoWindow permanently
+        riderMarker.showInfoWindow()
+Timber.i("${args.riderDistanceFromDriver} KM Away")
+        markers.add(riderMarker)
+
         // .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory
         // .HUE_RED))))
 
@@ -81,6 +98,10 @@ class DriverMapFragment : Fragment() {
 
         map.moveCamera(cu)
         map.animateCamera(CameraUpdateFactory.zoomTo(10f), 2000, null)
+
+        val latLngList = mutableListOf(riderLatLng, driverLatLng)
+
+        showPath(latLngList)
 
     }
 
@@ -119,9 +140,10 @@ class DriverMapFragment : Fragment() {
 
 
             // Verify it resolves
-            val activities: List<ResolveInfo> = requireActivity().packageManager.queryIntentActivities(
-                mapIntent,
-                PackageManager.MATCH_DEFAULT_ONLY)
+            val activities: List<ResolveInfo> =
+                requireActivity().packageManager.queryIntentActivities(
+                    mapIntent,
+                    PackageManager.MATCH_DEFAULT_ONLY)
             val isIntentSafe: Boolean = activities.isNotEmpty()
 
             // Start an activity if it's safe
@@ -138,6 +160,22 @@ class DriverMapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
+    }
+
+
+    private fun showPath(latLngList: MutableList<LatLng>) {
+
+
+        val polylineOptions = PolylineOptions()
+        polylineOptions.color(Color.MAGENTA)
+        polylineOptions.width(20f)
+        polylineOptions.addAll(latLngList)
+        magentaPolyline?.tag = "A"
+
+        magentaPolyline?.isClickable = true
+        magentaPolyline = map.addPolyline(polylineOptions)
+
+
     }
 
 

@@ -52,5 +52,8 @@
         <argument
             android:name="ridersID"
             app:argType="string" />
+        <argument
+            android:name="riderDistanceFromDriver"
+            app:argType="integer" />
     </fragment>
 </navigation>
