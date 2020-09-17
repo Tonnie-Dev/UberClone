@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import timber.log.Timber
+import java.util.*
 
 
 class DriverMapFragment : Fragment() {
@@ -177,6 +179,10 @@ Timber.i("${args.riderDistanceFromDriver} KM Away")
 
 
     }
+
+
+
+
 
 
 }

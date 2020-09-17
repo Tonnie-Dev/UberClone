@@ -1,6 +1,7 @@
 package com.androidshowtime.uberclone.driver
 
 
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
@@ -15,8 +16,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.androidshowtime.uberclone.databinding.FragmentDriverRequestViewBinding
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
+import java.util.*
 import kotlin.math.roundToInt
 
 class DriverRequestViewFragment : Fragment() {
@@ -27,9 +30,10 @@ class DriverRequestViewFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var driverCurrentLocation: Location
     private lateinit var requestsLocationList: MutableList<Location>
-private lateinit var documentID:String
-    private lateinit var  distanceList :MutableList<Int>
-    private  var riderDistanceFromDriver: Int = 0
+    private lateinit var documentID: String
+    private lateinit var distanceList: MutableList<Int>
+    private var riderDistanceFromDriver: Int = 0
+
     //request location permission
     val requestLocationPermission = registerForActivityResult(
         ActivityResultContracts
@@ -118,14 +122,16 @@ private lateinit var documentID:String
         binding.listView.adapter = adapter
 
         binding.listView.setOnItemClickListener { _, _, i, _ ->
-val userLocation = requestsLocationList[i]
+            val userLocation = requestsLocationList[i]
 
-riderDistanceFromDriver = distanceList[i]
+            riderDistanceFromDriver = distanceList[i]
 
-            findNavController().navigate(DriverRequestViewFragmentDirections
-                                             .actionDriverRequestViewFragmentToDriverMapFragment
-                                                 (userLocation, driverCurrentLocation,
-                                                  documentID,riderDistanceFromDriver))
+            findNavController().navigate(
+                DriverRequestViewFragmentDirections
+                    .actionDriverRequestViewFragmentToDriverMapFragment
+                        (
+                        userLocation, driverCurrentLocation,
+                        documentID, riderDistanceFromDriver))
 
         }
 
@@ -168,7 +174,7 @@ riderDistanceFromDriver = distanceList[i]
 
 
                     val geoPoint = requestDocument.getGeoPoint("geoPoint")!!
-                   documentID = requestDocument.id
+                    documentID = requestDocument.id
                     //set userLocation latitude and longitude on Location class
                     val userLocation = Location("")
                     userLocation.latitude = geoPoint.latitude
@@ -196,19 +202,20 @@ riderDistanceFromDriver = distanceList[i]
     }
 
 
-    private fun populateListWithRequests(docId: String, userLocation:Location) {
+    private fun populateListWithRequests(docId: String, userLocation: Location) {
 
         //capture user's geoPoint and store in in a list
         requestsLocationList.add(userLocation)
 
-
+        //obtain address from geoCoding Method
+        val address = geoCodingMethod(LatLng(userLocation.latitude, userLocation.longitude))
 
         //using Location class distanceTo() to calculate distance in km
         val distance = driverCurrentLocation.distanceTo(userLocation) / 1000
 
         //filter list to include only locations <50 KM
         if (distance <= 50.0) {
-            requestsList.add("$docId \n ${distance.roundToInt()} KM")
+            requestsList.add("$address \n ${distance.roundToInt()} KM")
             distanceList.add(distance.roundToInt())
             adapter.notifyDataSetChanged()
             Timber.i("List Size is after population ${requestsList.size}")
@@ -216,6 +223,54 @@ riderDistanceFromDriver = distanceList[i]
 
 
     }
+
+    //geoCodingMethod()
+    private fun geoCodingMethod(latLng: LatLng): String {
+
+        //initialize Geocoder
+        val geoCoder = Geocoder(activity, Locale.getDefault())
+        var address = ""
+        try {
+            val listOfAddresses = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+
+
+            //checking size of the list to ensure it has at least 1 item
+            if (listOfAddresses.size > 0) {
+                //null check on listOfAddresses
+                listOfAddresses?.let {
+
+
+                    if (it[0].locality != null) {
+                        if (it[0].subLocality != null) {
+
+                            if (it[0].thoroughfare != null) {
+
+                                address += listOfAddresses[0].thoroughfare + ", "
+                            }
+
+                            address += listOfAddresses[0].subLocality + " - "
+                        }
+
+
+
+                        address += listOfAddresses[0].locality
+                    }
+                }
+            }
+
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+
+        if (address.isEmpty()) {
+
+            address += "Unnamed Place"
+        }
+        return address
+    }
+
 
 }
 
