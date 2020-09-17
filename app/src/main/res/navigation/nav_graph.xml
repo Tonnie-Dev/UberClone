@@ -50,7 +50,7 @@
             android:name="driverLocation"
             app:argType="android.location.Location" />
         <argument
-            android:name="ridersID"
+            android:name="docID"
             app:argType="string" />
         <argument
             android:name="riderDistanceFromDriver"

@@ -177,7 +177,10 @@ class RiderFragment : Fragment() {
 
 
                 //delete document request from firestore
-                firestore.collection("UserLocation").document(docID).delete().addOnSuccessListener {
+                firestore.collection("UserLocation")
+                    .document(docID)
+                    .delete()
+                    .addOnSuccessListener {
 
                     Timber.i("$docID deleted")
                     Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()

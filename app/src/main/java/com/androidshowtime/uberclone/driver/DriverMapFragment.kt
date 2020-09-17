@@ -21,6 +21,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
 
 
@@ -34,6 +35,8 @@ class DriverMapFragment : Fragment() {
     private lateinit var riderLocation: Location
     private lateinit var driverLocation: Location
     private var magentaPolyline: Polyline? = null
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var docID: String
 
 
     private val callback = OnMapReadyCallback { googleMap ->
@@ -55,12 +58,12 @@ class DriverMapFragment : Fragment() {
 
         //rider marker
         val riderMarker = map.addMarker(
-            MarkerOptions().position(riderLatLng)
-                .title("Rider")
-                .flat(true)
-                .snippet(snippet)
+                MarkerOptions().position(riderLatLng)
+                    .title("Rider")
+                    .flat(true)
+                    .snippet(snippet)
 
-                .icon(BitmapDescriptorFactory.fromBitmap(bitmap)))
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap)))
 
         //show the infoWindow permanently
         riderMarker.showInfoWindow()
@@ -72,11 +75,11 @@ class DriverMapFragment : Fragment() {
 
 
         markers.add(
-            map.addMarker(
-                MarkerOptions().position(driverLatLng)
-                    .title("Driver")
-                    .snippet("Driver")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))))
+                map.addMarker(
+                        MarkerOptions().position(driverLatLng)
+                            .title("Driver")
+                            .snippet("Driver")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))))
 
         //create builder
         val builder = LatLngBounds.builder()
@@ -111,7 +114,8 @@ class DriverMapFragment : Fragment() {
 
         //create binding
         val binding = FragmentDriverMapBinding.inflate(inflater)
-
+        //retrieve docID
+        val docID = args.docID
         //initialize markers list
         markers = mutableListOf()
 
@@ -119,6 +123,22 @@ class DriverMapFragment : Fragment() {
         //acceptButton onClick implementation
         binding.acceptButton.setOnClickListener {
 
+            firestore = FirebaseFirestore.getInstance()
+
+
+            //update the requestAccepted field value in firestore
+            val docRef = firestore
+                .collection("UserLocation")
+                .document(docID)
+
+
+            docRef.update("requestAccepted", true).addOnSuccessListener {
+
+                Timber.i("update done - $docID")
+            }.addOnFailureListener{
+
+                Timber.i("update Failed!!")
+            }
 
             /*create the display map parameters to form the map URL(use %2C for URL encoding and escape commas)*/
             val origin = "origin=${driverLocation.latitude}%2C${driverLocation.longitude}&"
@@ -140,8 +160,8 @@ class DriverMapFragment : Fragment() {
             // Verify it resolves
             val activities: List<ResolveInfo> =
                 requireActivity().packageManager.queryIntentActivities(
-                    mapIntent,
-                    PackageManager.MATCH_DEFAULT_ONLY)
+                        mapIntent,
+                        PackageManager.MATCH_DEFAULT_ONLY)
             val isIntentSafe: Boolean = activities.isNotEmpty()
 
             // Start an activity if it's safe

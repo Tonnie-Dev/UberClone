@@ -32,8 +32,8 @@ class DriverRequestViewFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var driverCurrentLocation: Location
     private lateinit var requestsLocationList: MutableList<Location>
-    private lateinit var documentID: String
     private lateinit var distanceList: MutableList<Int>
+    private lateinit var documentIdsList: MutableList<String>
     private var riderDistanceFromDriver: Int = 0
 
     //request location permission
@@ -71,7 +71,7 @@ class DriverRequestViewFragment : Fragment() {
                     .addOnSuccessListener {
 
                         Timber.i("Geopoint saved - $driverLocation")
-                    }.addOnFailureListener{
+                    }.addOnFailureListener {
 
                         Timber.i("$it")
                     }
@@ -125,6 +125,7 @@ class DriverRequestViewFragment : Fragment() {
         requestsList = mutableListOf()
         requestsLocationList = mutableListOf()
         distanceList = mutableListOf()
+        documentIdsList = mutableListOf()
 
         //initialize Adapter
         adapter = ArrayAdapter<String>(
@@ -138,13 +139,14 @@ class DriverRequestViewFragment : Fragment() {
             val userLocation = requestsLocationList[i]
 
             riderDistanceFromDriver = distanceList[i]
+            val documentID = documentIdsList[i]
 
             findNavController().navigate(
+
+                    //insert argument to be passed into DriverMapFrament
                     DriverRequestViewFragmentDirections
                         .actionDriverRequestViewFragmentToDriverMapFragment
-                        (
-                                userLocation, driverCurrentLocation,
-                                documentID, riderDistanceFromDriver))
+                        (userLocation, driverCurrentLocation, documentID, riderDistanceFromDriver))
 
         }
 
@@ -180,14 +182,14 @@ class DriverRequestViewFragment : Fragment() {
 
         //get all request documents
         firestore.collection("UserLocation")
-            .get()
+            .get() //get all documents
             .addOnSuccessListener { result ->
 
-                for (requestDocument in result) {
+                for (document in result) {
 
 
-                    val geoPoint = requestDocument.getGeoPoint("geoPoint")!!
-                    documentID = requestDocument.id
+                    val geoPoint = document.getGeoPoint("geoPoint")!!
+                 val documentID = document.id
                     //set userLocation latitude and longitude on Location class
                     val userLocation = Location("")
                     userLocation.latitude = geoPoint.latitude
@@ -215,10 +217,11 @@ class DriverRequestViewFragment : Fragment() {
     }
 
 
-    private fun populateListWithRequests(docId: String, userLocation: Location) {
+    private fun populateListWithRequests(docID:String,userLocation: Location) {
 
         //capture user's geoPoint and store in in a list
         requestsLocationList.add(userLocation)
+        documentIdsList.add(docID)
 
 
         //obtain address from geoCoding Method
