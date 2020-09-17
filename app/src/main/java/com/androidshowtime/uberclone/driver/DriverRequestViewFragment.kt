@@ -15,9 +15,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.androidshowtime.uberclone.databinding.FragmentDriverRequestViewBinding
+import com.androidshowtime.uberclone.model.DriverLocation
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import timber.log.Timber
 import java.util.*
 import kotlin.math.roundToInt
@@ -35,10 +37,10 @@ class DriverRequestViewFragment : Fragment() {
     private var riderDistanceFromDriver: Int = 0
 
     //request location permission
-    val requestLocationPermission = registerForActivityResult(
-        ActivityResultContracts
-            .RequestPermission()
-                                                             ) {
+    private val requestLocationPermission = registerForActivityResult(
+            ActivityResultContracts
+                .RequestPermission()
+                                                                     ) {
         if (it) {
 
             startLocationUpdates()
@@ -61,7 +63,18 @@ class DriverRequestViewFragment : Fragment() {
             if (locationResult != null) {
 
                 locationResult.locations.forEach { driverCurrentLocation = it }
+                //save driver's location in firestore
+                val driverLocation = DriverLocation(
+                        GeoPoint(driverCurrentLocation.latitude, driverCurrentLocation.longitude))
+                firestore.collection("DriverLocation")
+                    .add(driverLocation)
+                    .addOnSuccessListener {
 
+                        Timber.i("Geopoint saved - $driverLocation")
+                    }.addOnFailureListener{
+
+                        Timber.i("$it")
+                    }
                 getAllRideRequests()
 
 
@@ -115,8 +128,8 @@ class DriverRequestViewFragment : Fragment() {
 
         //initialize Adapter
         adapter = ArrayAdapter<String>(
-            requireActivity(), android.R.layout
-                .simple_list_item_1, requestsList
+                requireActivity(), android.R.layout
+            .simple_list_item_1, requestsList
                                       )
 
         binding.listView.adapter = adapter
@@ -127,11 +140,11 @@ class DriverRequestViewFragment : Fragment() {
             riderDistanceFromDriver = distanceList[i]
 
             findNavController().navigate(
-                DriverRequestViewFragmentDirections
-                    .actionDriverRequestViewFragmentToDriverMapFragment
+                    DriverRequestViewFragmentDirections
+                        .actionDriverRequestViewFragmentToDriverMapFragment
                         (
-                        userLocation, driverCurrentLocation,
-                        documentID, riderDistanceFromDriver))
+                                userLocation, driverCurrentLocation,
+                                documentID, riderDistanceFromDriver))
 
         }
 
@@ -146,9 +159,9 @@ class DriverRequestViewFragment : Fragment() {
 
         try {
             fusedLocationProviderClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
                                                               )
         } catch (e: SecurityException) {
             //Create a function to request necessary permissions from the app.
@@ -207,9 +220,9 @@ class DriverRequestViewFragment : Fragment() {
         //capture user's geoPoint and store in in a list
         requestsLocationList.add(userLocation)
 
+
         //obtain address from geoCoding Method
         val address = geoCodingMethod(LatLng(userLocation.latitude, userLocation.longitude))
-
         //using Location class distanceTo() to calculate distance in km
         val distance = driverCurrentLocation.distanceTo(userLocation) / 1000
 
@@ -217,12 +230,17 @@ class DriverRequestViewFragment : Fragment() {
         if (distance <= 50.0) {
             requestsList.add("$address \n ${distance.roundToInt()} KM")
             distanceList.add(distance.roundToInt())
-            adapter.notifyDataSetChanged()
+
             Timber.i("List Size is after population ${requestsList.size}")
+
+
+
+
+            adapter.notifyDataSetChanged()
+
         }
-
-
     }
+
 
     //geoCodingMethod()
     private fun geoCodingMethod(latLng: LatLng): String {
@@ -230,8 +248,12 @@ class DriverRequestViewFragment : Fragment() {
         //initialize Geocoder
         val geoCoder = Geocoder(activity, Locale.getDefault())
         var address = ""
+
+
         try {
-            val listOfAddresses = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+
+            val listOfAddresses =
+                geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
 
 
             //checking size of the list to ensure it has at least 1 item
@@ -257,11 +279,12 @@ class DriverRequestViewFragment : Fragment() {
                     }
                 }
             }
-
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+
+
 
 
         if (address.isEmpty()) {

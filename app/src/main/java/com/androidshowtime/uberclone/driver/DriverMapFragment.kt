@@ -1,13 +1,11 @@
 package com.androidshowtime.uberclone.driver
 
 
-
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -24,7 +22,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import timber.log.Timber
-import java.util.*
 
 
 class DriverMapFragment : Fragment() {
@@ -37,7 +34,6 @@ class DriverMapFragment : Fragment() {
     private lateinit var riderLocation: Location
     private lateinit var driverLocation: Location
     private var magentaPolyline: Polyline? = null
-
 
 
     private val callback = OnMapReadyCallback { googleMap ->
@@ -68,7 +64,7 @@ class DriverMapFragment : Fragment() {
 
         //show the infoWindow permanently
         riderMarker.showInfoWindow()
-Timber.i("${args.riderDistanceFromDriver} KM Away")
+        Timber.i("${args.riderDistanceFromDriver} KM Away")
         markers.add(riderMarker)
 
         // .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory
@@ -179,10 +175,6 @@ Timber.i("${args.riderDistanceFromDriver} KM Away")
 
 
     }
-
-
-
-
 
 
 }

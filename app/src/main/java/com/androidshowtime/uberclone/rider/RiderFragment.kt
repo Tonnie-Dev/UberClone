@@ -37,7 +37,7 @@ class RiderFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var currentUserId: String
     private var isButtonClicked = false
-    private lateinit var docID:String
+    private lateinit var docID: String
 
     //vals
     private val args: RiderFragmentArgs by navArgs()
@@ -152,7 +152,7 @@ class RiderFragment : Fragment() {
 
 
                 val userType = args.userType
-                val userLocation = UserLocation( geoPoint, Date())
+                val userLocation = UserLocation(geoPoint, Date())
 
                 //save userLocation on firestore
                 firestore.collection("UserLocation")
@@ -180,7 +180,7 @@ class RiderFragment : Fragment() {
                 firestore.collection("UserLocation").document(docID).delete().addOnSuccessListener {
 
                     Timber.i("$docID deleted")
-                    Toast.makeText(activity,"Request Cancelled", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
                 }
 
 

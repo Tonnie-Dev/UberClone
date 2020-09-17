@@ -9,7 +9,7 @@
         android:id="@+id/loginFragment"
         android:name="com.androidshowtime.uberclone.login.LoginFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
+        tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_riderFragment"
             app:destination="@id/riderFragment" />
@@ -21,7 +21,7 @@
         android:id="@+id/riderFragment"
         android:name="com.androidshowtime.uberclone.rider.RiderFragment"
         android:label="fragment_rider"
-        tools:layout="@layout/fragment_rider" >
+        tools:layout="@layout/fragment_rider">
         <argument
             android:name="userType"
             app:argType="string" />
@@ -33,7 +33,7 @@
         android:id="@+id/driverRequestViewFragment"
         android:name="com.androidshowtime.uberclone.driver.DriverRequestViewFragment"
         android:label="fragment_driver"
-        tools:layout="@layout/fragment_driver_request_view" >
+        tools:layout="@layout/fragment_driver_request_view">
         <action
             android:id="@+id/action_driverRequestViewFragment_to_driverMapFragment"
             app:destination="@id/driverMapFragment" />
@@ -42,7 +42,7 @@
         android:id="@+id/driverMapFragment"
         android:name="com.androidshowtime.uberclone.driver.DriverMapFragment"
         android:label="fragment_driver_map"
-        tools:layout="@layout/fragment_driver_map" >
+        tools:layout="@layout/fragment_driver_map">
         <argument
             android:name="userLocation"
             app:argType="android.location.Location" />
