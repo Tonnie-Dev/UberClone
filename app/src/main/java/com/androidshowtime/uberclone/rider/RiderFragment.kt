@@ -3,6 +3,7 @@ package com.androidshowtime.uberclone.rider
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
@@ -38,9 +39,11 @@ class RiderFragment : Fragment() {
     private lateinit var currentUserId: String
     private var isButtonClicked = false
     private lateinit var docID: String
+    private lateinit var handler: Handler
 
     //vals
     private val args: RiderFragmentArgs by navArgs()
+
 
     // Single Permission Contract
     @SuppressLint("MissingPermission")
@@ -119,7 +122,8 @@ class RiderFragment : Fragment() {
         val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
         binding.viewModel = viewModel
 
-
+//initializing the handler
+        handler = Handler(Looper.getMainLooper())
         //initializing the fusedLocationProviderClient
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -171,6 +175,13 @@ class RiderFragment : Fragment() {
 
                 binding.callUberButton.text = getString(R.string.cancel_uber_request)
                 isButtonClicked = true
+
+
+                handler.postDelayed(Runnable {
+
+
+                    //method that we can run oftenly as per the specified duration
+                }, )
             }
             //Uber Request Cancellation
             else {
