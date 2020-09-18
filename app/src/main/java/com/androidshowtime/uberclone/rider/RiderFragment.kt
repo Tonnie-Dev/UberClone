@@ -40,6 +40,7 @@ class RiderFragment : Fragment() {
     private var isButtonClicked = false
     private lateinit var docID: String
     private lateinit var handler: Handler
+    private  var isRequestAccepted = false
 
     //vals
     private val args: RiderFragmentArgs by navArgs()
@@ -179,9 +180,9 @@ class RiderFragment : Fragment() {
 
                 handler.postDelayed(Runnable {
 
-
-                    //method that we can run oftenly as per the specified duration
-                }, )
+checkForUpdates()
+                    //method that we can run after 2 secs
+                },2000 )
             }
             //Uber Request Cancellation
             else {
@@ -213,6 +214,28 @@ class RiderFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun checkForUpdates() {
+
+        //check if the request has been accepted
+        val docRef = firestore
+            .collection("UserLocation")
+            .document(docID)
+
+
+        docRef.get().addOnSuccessListener {
+
+            if (it != null) {
+                val userLocation = it.toObject(UserLocation::class.java)!!
+              isRequestAccepted= userLocation.isRequestAccepted
+            }
+
+
+        }
+
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
