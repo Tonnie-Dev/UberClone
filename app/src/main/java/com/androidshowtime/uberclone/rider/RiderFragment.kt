@@ -232,6 +232,8 @@ class RiderFragment : Fragment() {
             if (it != null) {
                 val userLocation = it.toObject(UserLocation::class.java)!!
                 isRequestAccepted = userLocation.isRequestAccepted
+
+                Timber.i("isRequested = $isRequestAccepted")
             }
 
 

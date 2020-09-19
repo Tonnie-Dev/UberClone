@@ -95,15 +95,18 @@ class DriverMapFragment : Fragment() {
         //set a 150 pixels padding from the edge of the screen
         val cu = CameraUpdateFactory.newLatLngBounds(bounds, 150)
 
+
+
+
         //move and animate the camera
 
         map.moveCamera(cu)
-        map.animateCamera(CameraUpdateFactory.zoomTo(10f), 2000, null)
+        map.animateCamera(CameraUpdateFactory.zoomTo(11f), 2000, null)
 
+
+        //draw polygon
         val latLngList = mutableListOf(riderLatLng, driverLatLng)
-
         showPath(latLngList)
-
     }
 
     override fun onCreateView(
@@ -135,7 +138,7 @@ class DriverMapFragment : Fragment() {
             docRef.update("requestAccepted", true).addOnSuccessListener {
 
                 Timber.i("update done - $docID")
-            }.addOnFailureListener{
+            }.addOnFailureListener {
 
                 Timber.i("update Failed!!")
             }
