@@ -40,7 +40,8 @@ class RiderFragment : Fragment() {
     private var isButtonClicked = false
     private lateinit var docID: String
     private lateinit var handler: Handler
-    private  var isRequestAccepted = false
+    private var isRequestAccepted = false
+    private lateinit var binding: FragmentRiderBinding
 
     //vals
     private val args: RiderFragmentArgs by navArgs()
@@ -57,8 +58,8 @@ class RiderFragment : Fragment() {
             startLocationUpdates()
         } else {
             Toast.makeText(
-                activity, "Location Permission Needed",
-                Toast.LENGTH_SHORT
+                    activity, "Location Permission Needed",
+                    Toast.LENGTH_SHORT
                           )
                 .show()
         }
@@ -77,13 +78,13 @@ class RiderFragment : Fragment() {
         //Called when the device location is available.
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
-            Timber.i("onLocationResult Triggered")
+
 
             if (locationResult != null) {
                 //locationResult.locations.forEach { currentLocation = it }
                 currentLocation = locationResult.lastLocation
                 Timber.i(
-                    "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}"
+                        "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}"
                         )
 
                 //positioning the camera and the marker
@@ -119,11 +120,11 @@ class RiderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
                              ): View? {
-        val binding = FragmentRiderBinding.inflate(inflater)
+        binding = FragmentRiderBinding.inflate(inflater)
         val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
         binding.viewModel = viewModel
 
-//initializing the handler
+        //initializing the handler
         handler = Handler(Looper.getMainLooper())
         //initializing the fusedLocationProviderClient
         fusedLocationProviderClient =
@@ -180,9 +181,11 @@ class RiderFragment : Fragment() {
 
                 handler.postDelayed(Runnable {
 
-checkForUpdates()
+                    Timber.i("postDelayed() Triggered")
+
+                    checkForUpdates()
                     //method that we can run after 2 secs
-                },2000 )
+                }, 2000)
             }
             //Uber Request Cancellation
             else {
@@ -194,9 +197,9 @@ checkForUpdates()
                     .delete()
                     .addOnSuccessListener {
 
-                    Timber.i("$docID deleted")
-                    Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
-                }
+                        Timber.i("$docID deleted")
+                        Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
+                    }
 
 
                 binding.callUberButton.text = getString(R.string.request_uber)
@@ -217,7 +220,7 @@ checkForUpdates()
     }
 
     private fun checkForUpdates() {
-
+        Timber.i("postDelayed() Triggered")
         //check if the request has been accepted
         val docRef = firestore
             .collection("UserLocation")
@@ -228,13 +231,20 @@ checkForUpdates()
 
             if (it != null) {
                 val userLocation = it.toObject(UserLocation::class.java)!!
-              isRequestAccepted= userLocation.isRequestAccepted
+                isRequestAccepted = userLocation.isRequestAccepted
             }
 
 
+        }.addOnFailureListener { Timber.i("Document not found") }
+
+
+
+        if (isRequestAccepted) {
+
+
+            binding.infoTextView.text = resources.getString(R.string.driver_on_the_way)
+            Timber.i("Value of Text changed")
         }
-
-
 
     }
 
@@ -250,8 +260,8 @@ checkForUpdates()
     private fun startLocationUpdates() {
         try {
             fusedLocationProviderClient.requestLocationUpdates(
-                locationRequest, locationCallback,
-                Looper.getMainLooper()
+                    locationRequest, locationCallback,
+                    Looper.getMainLooper()
                                                               )
         } catch (e: SecurityException) {
             //Create a function to request necessary permissions from the app.
@@ -274,10 +284,12 @@ checkForUpdates()
         //obtain currentLatLng from the currentLocation
         val currentLatLng = LatLng(location.latitude, location.longitude)
         map.addMarker(
-            MarkerOptions().position(currentLatLng)
-                .title("Your Location")
-                     )
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 5f))
+                MarkerOptions().position(currentLatLng)
+                    .title("Your Location"))
+
+
+        map.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
+        map.animateCamera(CameraUpdateFactory.zoomTo(14f), 1000, null)
     }
 
 
