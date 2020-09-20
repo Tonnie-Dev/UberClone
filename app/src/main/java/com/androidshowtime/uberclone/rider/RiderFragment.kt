@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.androidshowtime.uberclone.MyViewModel
 import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
+import com.androidshowtime.uberclone.model.UberRequest
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -40,8 +41,6 @@ class RiderFragment : Fragment() {
     private lateinit var handler: Handler
     private var isAccepted = false
     private lateinit var binding: FragmentRiderBinding
-
-
 
 
     // Single Permission Contract
@@ -156,12 +155,12 @@ class RiderFragment : Fragment() {
                 val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
 
 
-                //create userLocation object with 3 arguments
-                val userLocation = UserLocation(geoPoint,  787,Date())
-Timber.i("originalU-loc $userLocation")
+                //create uberRequest object with 3 arguments
+                val request = UberRequest(geoPoint, isAccepted, Date())
+                Timber.i("originalU-loc $request")
                 //save userLocation on firestore
-                firestore.collection("UserLocation")
-                    .add(userLocation)
+                firestore.collection("UberRequest")
+                    .add(request)
                     .addOnSuccessListener {
 
                         //get the document id for using in deleting the document
@@ -180,18 +179,18 @@ Timber.i("originalU-loc $userLocation")
 
                 handler.postDelayed({
 
-                    Timber.i("postDelayed() Triggered from button")
+                                        Timber.i("postDelayed() Triggered from button")
                                         //method that we can run after 2 secs
                                         checkForUpdates()
 
-                }, 5000)
+                                    }, 5000)
             }
             //Uber Request Cancellation
             else {
 
 
                 //delete document request from firestore
-                firestore.collection("UserLocation")
+                firestore.collection("UberRequest")
                     .document(docID)
                     .delete()
                     .addOnSuccessListener {
@@ -225,34 +224,34 @@ Timber.i("originalU-loc $userLocation")
 
         //create a document reference
         val docRef = firestore
-            .collection("UserLocation")
+            .collection("UberRequest")
             .document(docID)
 
-//use get() to retrieve the document specified by docID variable
+        //use get() to retrieve the document specified by docID variable
         docRef.get()
             .addOnSuccessListener { documentSnapshot ->
                 //if documentSnapshot is not null read value of isRequestAccepted
-            if (documentSnapshot != null) {
-                val userLocation = documentSnapshot.toObject(UserLocation::class.java)
+                if (documentSnapshot != null) {
+                    val request = documentSnapshot.toObject(UberRequest::class.java)
 
 
 
 
 
-                Timber.i("uLoc = $userLocation")
-                if (userLocation != null) {
+                    Timber.i("uLoc = $request")
+                    if (request != null) {
 
-                    Timber.i("uLoc-geo = ${userLocation.geoPoint}")
-                    Timber.i("uLoc-isAccepted = ${userLocation.isReqAccepted}")
-                    Timber.i("uLoc-time  = ${userLocation.timestamp}")
+                        Timber.i("uLoc-geo = ${request.geoPoint}")
+                        Timber.i("uLoc-isAccepted = ${request.accepted}")
+                        Timber.i("uLoc-time  = ${request.timestamp}")
+                    }
+
+
+                    // Timber.i("isAccepted = $isAccepted")
                 }
 
 
-               // Timber.i("isAccepted = $isAccepted")
-            }
-
-
-        }.addOnFailureListener { Timber.i("Document not found") }
+            }.addOnFailureListener { Timber.i("Document not found") }
 
 
 
@@ -271,7 +270,8 @@ Timber.i("originalU-loc $userLocation")
                 {
                     Timber.i("postDelayed() Triggered - $docID")
 
-            checkForUpdates() }, 2000)
+                    checkForUpdates()
+                }, 2000)
 
     }
 
