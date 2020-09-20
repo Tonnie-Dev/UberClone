@@ -251,6 +251,11 @@ class RiderFragment : Fragment() {
             binding.callUberButton.visibility = View.INVISIBLE
         }
 
+        handler.postDelayed({
+            checkForUpdates()
+
+                            }, 2000)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
