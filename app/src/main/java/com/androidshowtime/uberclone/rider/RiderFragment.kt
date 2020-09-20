@@ -246,6 +246,9 @@ class RiderFragment : Fragment() {
 
             binding.infoTextView.text = resources.getString(R.string.driver_on_the_way)
             Timber.i("Value of Text changed")
+
+            //make callUberButton INVISIBLE
+            binding.callUberButton.visibility = View.INVISIBLE
         }
 
     }
