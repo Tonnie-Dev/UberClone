@@ -181,7 +181,7 @@ class DriverRequestViewFragment : Fragment() {
     private fun getAllRideRequests() {
 
         //get all request documents
-        firestore.collection("UserLocation")
+        firestore.collection("UberRequest")
             .get() //get all documents
             .addOnSuccessListener { result ->
 
