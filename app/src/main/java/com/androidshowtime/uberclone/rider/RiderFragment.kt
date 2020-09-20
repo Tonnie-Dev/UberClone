@@ -236,20 +236,10 @@ class RiderFragment : Fragment() {
                     if (documentSnapshot != null) {
                         val uberRequest = documentSnapshot.toObject(UberRequest::class.java)
 
-
-
-
-
-                        Timber.i("uLoc = $uberRequest")
-                        if (uberRequest != null) {
-
-                            Timber.i("uLoc-geo = ${uberRequest.geoPoint}")
-                            Timber.i("uLoc-isAccepted = ${uberRequest.accepted}")
-                            Timber.i("uLoc-time  = ${uberRequest.timestamp}")
-                        }
-
-
-                        // Timber.i("isAccepted = $isAccepted")
+                      //null check on UberRequest object
+                       uberRequest?.let { uberRequest ->
+                           isAccepted = uberRequest.accepted
+                       }
                     }
 
 
