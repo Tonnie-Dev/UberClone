@@ -52,12 +52,13 @@ class RiderFragment : Fragment() {
 
             //request for Location Updates
             startLocationUpdates()
-        } else {
+        }
+        else {
             Toast.makeText(
                     activity, "Location Permission Needed",
                     Toast.LENGTH_SHORT
                           )
-                .show()
+                    .show()
         }
 
 
@@ -87,7 +88,8 @@ class RiderFragment : Fragment() {
                 moveMarkerAndCamera(currentLocation)
 
 
-            } else {
+            }
+            else {
                 //log Location as null
                 Timber.i("Location is null!!!")
                 return
@@ -114,9 +116,9 @@ class RiderFragment : Fragment() {
 
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
                              ): View? {
         binding = FragmentRiderBinding.inflate(inflater)
         val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
@@ -126,7 +128,7 @@ class RiderFragment : Fragment() {
         handler = Handler(Looper.getMainLooper())
         //initializing the fusedLocationProviderClient
         fusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(requireActivity())
+                LocationServices.getFusedLocationProviderClient(requireActivity())
 
         //initializing locationRequest
         locationRequest = LocationRequest().apply {
@@ -160,17 +162,17 @@ class RiderFragment : Fragment() {
                 Timber.i("originalU-loc $request")
                 //save userLocation on firestore
                 firestore.collection("UberRequest")
-                    .add(request)
-                    .addOnSuccessListener {
+                        .add(request)
+                        .addOnSuccessListener {
 
-                        //get the document id for using in deleting the document
-                        docID = it.id
-                        Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
-                            .show()
-                    }.addOnFailureListener {
+                            //get the document id for using in deleting the document
+                            docID = it.id
+                            Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
+                                    .show()
+                        }.addOnFailureListener {
 
-                        Timber.i("Error in saving User's location: $it")
-                    }
+                            Timber.i("Error in saving User's location: $it")
+                        }
 
 
                 binding.callUberButton.text = getString(R.string.cancel_uber_request)
@@ -191,13 +193,13 @@ class RiderFragment : Fragment() {
 
                 //delete document request from firestore
                 firestore.collection("UberRequest")
-                    .document(docID)
-                    .delete()
-                    .addOnSuccessListener {
+                        .document(docID)
+                        .delete()
+                        .addOnSuccessListener {
 
-                        Timber.i("$docID deleted")
-                        Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
-                    }
+                            Timber.i("$docID deleted")
+                            Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
+                        }
 
 
                 binding.callUberButton.text = getString(R.string.request_uber)
@@ -224,34 +226,34 @@ class RiderFragment : Fragment() {
 
         //create a document reference
         val docRef = firestore
-            .collection("UberRequest")
-            .document(docID)
+                .collection("UberRequest")
+                .document(docID)
 
         //use get() to retrieve the document specified by docID variable
         docRef.get()
-            .addOnSuccessListener { documentSnapshot ->
-                //if documentSnapshot is not null read value of isRequestAccepted
-                if (documentSnapshot != null) {
-                    val request = documentSnapshot.toObject(UberRequest::class.java)
+                .addOnSuccessListener { documentSnapshot ->
+                    //if documentSnapshot is not null read value of isRequestAccepted
+                    if (documentSnapshot != null) {
+                        val uberRequest = documentSnapshot.toObject(UberRequest::class.java)
 
 
 
 
 
-                    Timber.i("uLoc = $request")
-                    if (request != null) {
+                        Timber.i("uLoc = $uberRequest")
+                        if (uberRequest != null) {
 
-                        Timber.i("uLoc-geo = ${request.geoPoint}")
-                        Timber.i("uLoc-isAccepted = ${request.accepted}")
-                        Timber.i("uLoc-time  = ${request.timestamp}")
+                            Timber.i("uLoc-geo = ${uberRequest.geoPoint}")
+                            Timber.i("uLoc-isAccepted = ${uberRequest.accepted}")
+                            Timber.i("uLoc-time  = ${uberRequest.timestamp}")
+                        }
+
+
+                        // Timber.i("isAccepted = $isAccepted")
                     }
 
 
-                    // Timber.i("isAccepted = $isAccepted")
-                }
-
-
-            }.addOnFailureListener { Timber.i("Document not found") }
+                }.addOnFailureListener { Timber.i("Document not found") }
 
 
 
@@ -290,7 +292,8 @@ class RiderFragment : Fragment() {
                     locationRequest, locationCallback,
                     Looper.getMainLooper()
                                                               )
-        } catch (e: SecurityException) {
+        }
+        catch (e: SecurityException) {
             //Create a function to request necessary permissions from the app.
 
         }
@@ -312,7 +315,7 @@ class RiderFragment : Fragment() {
         val currentLatLng = LatLng(location.latitude, location.longitude)
         map.addMarker(
                 MarkerOptions().position(currentLatLng)
-                    .title("Your Location"))
+                        .title("Your Location"))
 
 
         map.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
