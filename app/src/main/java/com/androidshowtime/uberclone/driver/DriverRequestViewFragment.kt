@@ -242,6 +242,13 @@ class DriverRequestViewFragment : Fragment() {
             adapter.notifyDataSetChanged()
 
         }
+
+
+        if (requestsList.size <=0){
+
+            requestsList.add("No Requests Found")
+            adapter.notifyDataSetChanged()
+        }
     }
 
 

@@ -13,11 +13,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.MyViewModel
 import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
-import com.androidshowtime.uberclone.model.UserLocation
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -40,11 +38,10 @@ class RiderFragment : Fragment() {
     private var isButtonClicked = false
     private lateinit var docID: String
     private lateinit var handler: Handler
-    private var isRequestAccepted = false
+    private var isAccepted = false
     private lateinit var binding: FragmentRiderBinding
 
-    //vals
-    private val args: RiderFragmentArgs by navArgs()
+
 
 
     // Single Permission Contract
@@ -97,6 +94,8 @@ class RiderFragment : Fragment() {
                 return
 
             }
+
+
         }
 
 
@@ -135,8 +134,8 @@ class RiderFragment : Fragment() {
 
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 5000
-            fastestInterval = 3000
+            interval = 6000
+            fastestInterval = 5000
         }
 
         //initializing Firestore
@@ -157,9 +156,9 @@ class RiderFragment : Fragment() {
                 val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
 
 
-                val userType = args.userType
-                val userLocation = UserLocation(geoPoint, Date())
-
+                //create userLocation object with 3 arguments
+                val userLocation = UserLocation(geoPoint,  787,Date())
+Timber.i("originalU-loc $userLocation")
                 //save userLocation on firestore
                 firestore.collection("UserLocation")
                     .add(userLocation)
@@ -179,13 +178,13 @@ class RiderFragment : Fragment() {
                 isButtonClicked = true
 
 
-                handler.postDelayed(Runnable {
+                handler.postDelayed({
 
-                    Timber.i("postDelayed() Triggered")
+                    Timber.i("postDelayed() Triggered from button")
+                                        //method that we can run after 2 secs
+                                        checkForUpdates()
 
-                    checkForUpdates()
-                    //method that we can run after 2 secs
-                }, 2000)
+                }, 5000)
             }
             //Uber Request Cancellation
             else {
@@ -220,20 +219,36 @@ class RiderFragment : Fragment() {
     }
 
     private fun checkForUpdates() {
-        Timber.i("postDelayed() Triggered")
-        //check if the request has been accepted
+
+
+        //check if the request has been accepted by the driver
+
+        //create a document reference
         val docRef = firestore
             .collection("UserLocation")
             .document(docID)
 
+//use get() to retrieve the document specified by docID variable
+        docRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                //if documentSnapshot is not null read value of isRequestAccepted
+            if (documentSnapshot != null) {
+                val userLocation = documentSnapshot.toObject(UserLocation::class.java)
 
-        docRef.get().addOnSuccessListener {
 
-            if (it != null) {
-                val userLocation = it.toObject(UserLocation::class.java)!!
-                isRequestAccepted = userLocation.isRequestAccepted
 
-                Timber.i("isRequested = $isRequestAccepted")
+
+
+                Timber.i("uLoc = $userLocation")
+                if (userLocation != null) {
+
+                    Timber.i("uLoc-geo = ${userLocation.geoPoint}")
+                    Timber.i("uLoc-isAccepted = ${userLocation.isReqAccepted}")
+                    Timber.i("uLoc-time  = ${userLocation.timestamp}")
+                }
+
+
+               // Timber.i("isAccepted = $isAccepted")
             }
 
 
@@ -241,20 +256,22 @@ class RiderFragment : Fragment() {
 
 
 
-        if (isRequestAccepted) {
+        if (isAccepted) {
 
 
             binding.infoTextView.text = resources.getString(R.string.driver_on_the_way)
-            Timber.i("Value of Text changed")
+
 
             //make callUberButton INVISIBLE
             binding.callUberButton.visibility = View.INVISIBLE
         }
 
-        handler.postDelayed({
-            checkForUpdates()
+        handler.postDelayed(
 
-                            }, 2000)
+                {
+                    Timber.i("postDelayed() Triggered - $docID")
+
+            checkForUpdates() }, 2000)
 
     }
 
