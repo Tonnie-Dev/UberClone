@@ -10,6 +10,7 @@
     <string name="log_out">Log Out</string>
     <string name="accept_request">Accept Request</string>
     <string name="driver_on_the_way">Your Driver is on the Way</string>
+    <string name="rider_marker">I\'m here</string>
 
 
 </resources>

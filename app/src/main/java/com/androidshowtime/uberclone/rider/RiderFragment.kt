@@ -22,7 +22,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -54,12 +56,13 @@ class RiderFragment : Fragment() {
 
             //request for Location Updates
             startLocationUpdates()
-        } else {
+        }
+        else {
             Toast.makeText(
-                activity, "Location Permission Needed",
-                Toast.LENGTH_SHORT
+                    activity, "Location Permission Needed",
+                    Toast.LENGTH_SHORT
                           )
-                .show()
+                    .show()
         }
 
 
@@ -82,14 +85,15 @@ class RiderFragment : Fragment() {
                 //locationResult.locations.forEach { currentLocation = it }
                 currentLocation = locationResult.lastLocation
                 Timber.i(
-                    "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}"
+                        "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}"
                         )
 
                 //positioning the camera and the marker
                 moveMarkerAndCamera(currentLocation)
 
 
-            } else {
+            }
+            else {
                 //log Location as null
                 Timber.i("Location is null!!!")
                 return
@@ -112,13 +116,15 @@ class RiderFragment : Fragment() {
 
         //request Permission
         reqPerm.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+
     }
 
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
                              ): View? {
         binding = FragmentRiderBinding.inflate(inflater)
         val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
@@ -128,15 +134,15 @@ class RiderFragment : Fragment() {
         handler = Handler(Looper.getMainLooper())
         //initializing the fusedLocationProviderClient
         fusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(requireActivity())
+                LocationServices.getFusedLocationProviderClient(requireActivity())
 
         //initializing locationRequest
         locationRequest = LocationRequest().apply {
 
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 6000
-            fastestInterval = 5000
+            interval = 15000
+            fastestInterval = 10000
         }
 
         //initializing Firestore
@@ -162,17 +168,17 @@ class RiderFragment : Fragment() {
                 Timber.i("originalU-loc $request")
                 //save userLocation on firestore
                 firestore.collection("UberRequest")
-                    .add(request)
-                    .addOnSuccessListener {
+                        .add(request)
+                        .addOnSuccessListener {
 
-                        //get the document id for using in deleting the document
-                        docID = it.id
-                        Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
-                            .show()
-                    }.addOnFailureListener {
+                            //get the document id for using in deleting the document
+                            docID = it.id
+                            Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
+                                    .show()
+                        }.addOnFailureListener {
 
-                        Timber.i("Error in saving User's location: $it")
-                    }
+                            Timber.i("Error in saving User's location: $it")
+                        }
 
 
                 binding.callUberButton.text = getString(R.string.cancel_uber_request)
@@ -193,13 +199,13 @@ class RiderFragment : Fragment() {
 
                 //delete document request from firestore
                 firestore.collection("UberRequest")
-                    .document(docID)
-                    .delete()
-                    .addOnSuccessListener {
+                        .document(docID)
+                        .delete()
+                        .addOnSuccessListener {
 
-                        Timber.i("$docID deleted")
-                        Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
-                    }
+                            Timber.i("$docID deleted")
+                            Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
+                        }
 
 
                 binding.callUberButton.text = getString(R.string.request_uber)
@@ -226,36 +232,35 @@ class RiderFragment : Fragment() {
 
         //create a document reference
         val docRef = firestore
-            .collection("UberRequest")
-            .document(docID)
+                .collection("UberRequest")
+                .document(docID)
 
         //use get() to retrieve the document specified by docID variable
         docRef.get(Source.SERVER)
-            .addOnSuccessListener { documentSnapshot ->
-                //if documentSnapshot is not null read value of isRequestAccepted
-                if (documentSnapshot != null) {
-                    val uberRequest = documentSnapshot.toObject(UberRequest::class.java)
+                .addOnSuccessListener { documentSnapshot ->
+                    //if documentSnapshot is not null read value of isRequestAccepted
+                    if (documentSnapshot != null) {
+                        val uberRequest = documentSnapshot.toObject(UberRequest::class.java)
 
-                    //null check on UberRequest object
-                    uberRequest?.let {
-                        //set the value of isAccepted to server's value
-                        isRequestAccepted = uberRequest.accepted
+                        //null check on UberRequest object
+                        uberRequest?.let {
+                            //set the value of isAccepted to server's value
+                            isRequestAccepted = uberRequest.accepted
+                        }
                     }
-                }
 
 
-            }.addOnFailureListener { Timber.i("Document not found") }
+                }.addOnFailureListener { Timber.i("Document not found") }
 
 
 
         if (isRequestAccepted) {
 
 
-
             Snackbar.make(
-                binding.root,
-                resources.getString(R.string.driver_on_the_way),
-                Snackbar.LENGTH_SHORT
+                    binding.root,
+                    resources.getString(R.string.driver_on_the_way),
+                    Snackbar.LENGTH_SHORT
                          ).show()
             //make callUberButton INVISIBLE
             binding.callUberButton.visibility = View.INVISIBLE
@@ -264,11 +269,11 @@ class RiderFragment : Fragment() {
         //handler to call checkForUpdates() after every 5 secs
         handler.postDelayed(
 
-            {
-                Timber.i("postDelayed() Triggered - $docID")
+                {
+                    Timber.i("postDelayed() Triggered - $docID")
 
-                checkForUpdates()
-            }, 5000
+                    checkForUpdates()
+                }, 5000
                            )
 
     }
@@ -285,10 +290,11 @@ class RiderFragment : Fragment() {
     private fun startLocationUpdates() {
         try {
             fusedLocationProviderClient.requestLocationUpdates(
-                locationRequest, locationCallback,
-                Looper.getMainLooper()
+                    locationRequest, locationCallback,
+                    Looper.getMainLooper()
                                                               )
-        } catch (e: SecurityException) {
+        }
+        catch (e: SecurityException) {
             //Create a function to request necessary permissions from the app.
 
         }
@@ -304,18 +310,30 @@ class RiderFragment : Fragment() {
     //move camera around
     fun moveMarkerAndCamera(location: Location) {
         //clear map before setting the marker
-
         map.clear()
+
         //obtain currentLatLng from the currentLocation
         val currentLatLng = LatLng(location.latitude, location.longitude)
-        map.addMarker(
-            MarkerOptions().position(currentLatLng)
-                .title("Your Location")
-                     )
+        val builder = LatLngBounds.builder()
+
+        //create rider's marker
+        val marker = map.addMarker(
+                MarkerOptions().position(currentLatLng)
+                        .title(resources.getString(R.string.rider_marker))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+        //make info window persist on the map
+        marker.showInfoWindow()
+        builder.include(marker.position)
 
 
-        map.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
-        map.animateCamera(CameraUpdateFactory.zoomTo(14f), 1000, null)
+        //generate bounds
+        val bounds = builder.build()
+
+        //CameraUpdateFactory
+        val cu = CameraUpdateFactory.newLatLngBounds(bounds, 200)
+        map.moveCamera(cu)
+        map.animateCamera(CameraUpdateFactory.zoomTo(11f), 2000, null)
+
     }
 
 
