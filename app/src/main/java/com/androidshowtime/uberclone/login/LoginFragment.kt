@@ -17,11 +17,12 @@ import timber.log.Timber
 
 
 class LoginFragment : Fragment() {
-    //declaring firebase components
+    //vars
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseDatabase
     private lateinit var firestore: FirebaseFirestore
     private var currentUser: FirebaseUser? = null
+    private lateinit var uid:String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,6 +32,7 @@ class LoginFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         signInAnonymously()
         currentUser = auth.currentUser
+        uid = currentUser?.uid.toString()
 
         //obtain reference to Database
         db = FirebaseDatabase.getInstance()
@@ -52,42 +54,8 @@ class LoginFragment : Fragment() {
                 userType = "Driver"
             }
 
-            // create a new user with usertype for Realtime Dabase
-            val userMapRTD = mapOf("User Type" to userType)
-            currentUser?.uid?.let { it1 ->
-                db.reference.child("Users")
-                    .child(it1)
-                    .setValue(userMapRTD)
-            }
-
-            // create a new user with userType for Firestore
-            val userMapCF = mapOf("User Type" to userType)
-
-            // Add a new document with an auto-generated  doc ID
-            firestore.collection("users") //collection
-                .add(userMapCF) // document with auto ID
-                .addOnSuccessListener {
-
-                    Timber.i("DocumentSnapshot added with ID ${it.id}")
-                }
-                .addOnFailureListener {
-
-                    Timber.i("Error Encountered - $it")
-                }
 
 
-            currentUser?.uid?.let { uid ->
-                firestore.collection("users") //collection
-                    .document(uid)           //document ID specified
-                    .set(userMapCF).addOnSuccessListener {
-
-                        Timber.i("Document created")
-                    }
-                    .addOnFailureListener {
-
-                        Timber.i("Error Encountered - $it")
-                    }
-            }
 
 
             when (userType) {
@@ -96,8 +64,7 @@ class LoginFragment : Fragment() {
 
 
                     findNavController().navigate(
-                        LoginFragmentDirections.actionLoginFragmentToRiderFragment(userType)
-                                                )
+                        LoginFragmentDirections.actionLoginFragmentToRiderFragment(uid))
                 }
 
                 //if userType is is a Driver, navigate to DriverFragment
@@ -105,8 +72,7 @@ class LoginFragment : Fragment() {
 
 
                     findNavController().navigate(
-                        LoginFragmentDirections.actionLoginFragmentToDriverFragment()
-                                                )
+                        LoginFragmentDirections.actionLoginFragmentToDriverFragment(uid))
 
                 }
 
@@ -131,6 +97,8 @@ class LoginFragment : Fragment() {
 
                 if (it.isSuccessful) {
 
+
+                    Timber.i("The Current User is - ${currentUser?.uid}")
                     Toast.makeText(activity, "Anonymous Login Successful", Toast.LENGTH_SHORT)
                         .show()
 

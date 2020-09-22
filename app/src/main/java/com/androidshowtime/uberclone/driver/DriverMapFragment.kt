@@ -101,7 +101,7 @@ class DriverMapFragment : Fragment() {
         //move and animate the camera
 
         map.moveCamera(cu)
-        map.animateCamera(CameraUpdateFactory.zoomTo(11f), 2000, null)
+        map.animateCamera(CameraUpdateFactory.zoomTo(13f), 2000, null)
 
 
         //draw polygon
@@ -189,7 +189,7 @@ class DriverMapFragment : Fragment() {
 
         val polylineOptions = PolylineOptions()
         polylineOptions.color(Color.MAGENTA)
-        polylineOptions.width(20f)
+        polylineOptions.width(3f)
         polylineOptions.addAll(latLngList)
         magentaPolyline?.tag = "A"
 

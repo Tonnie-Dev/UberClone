@@ -4,10 +4,13 @@ import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 
-data class UberRequest(val geoPoint: GeoPoint? = null,
+data class UberRequest( val docId:String  = "",
+                        val geoPoint: GeoPoint? = null,
 
-                       //using 'is' prefix on boolean property
+                       //don't ues 'is' prefix on boolean property on firebase
                        val accepted:Boolean = false,
+
+
                        @ServerTimestamp
                        val timestamp: Date? = null)
 

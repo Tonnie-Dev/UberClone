@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.databinding.FragmentDriverRequestViewBinding
 import com.androidshowtime.uberclone.model.DriverLocation
 import com.google.android.gms.location.*
@@ -35,6 +36,9 @@ class DriverRequestViewFragment : Fragment() {
     private lateinit var distanceList: MutableList<Int>
     private lateinit var documentIdsList: MutableList<String>
     private var riderDistanceFromDriver: Int = 0
+
+    //vals
+    private val args:DriverRequestViewFragmentArgs by navArgs()
 
     //request location permission
     private val requestLocationPermission = registerForActivityResult(
@@ -63,8 +67,10 @@ class DriverRequestViewFragment : Fragment() {
             if (locationResult != null) {
 
                 locationResult.locations.forEach { driverCurrentLocation = it }
+                val uid = args.uid
+
                 //save driver's location in firestore
-                val driverLocation = DriverLocation(
+                val driverLocation = DriverLocation(uid,
                         GeoPoint(driverCurrentLocation.latitude, driverCurrentLocation.longitude))
                 firestore.collection("DriverLocation")
                     .add(driverLocation)
@@ -302,6 +308,12 @@ class DriverRequestViewFragment : Fragment() {
             address += "Unnamed Place"
         }
         return address
+    }
+
+    fun retrieveRiderDocId() {
+
+        
+
     }
 
 

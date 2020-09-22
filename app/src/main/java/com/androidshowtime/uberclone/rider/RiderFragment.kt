@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.MyViewModel
 import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentRiderBinding
@@ -46,6 +47,8 @@ class RiderFragment : Fragment() {
     private var isRequestAccepted = false
     private lateinit var binding: FragmentRiderBinding
 
+    //vals
+    private val args:RiderFragmentArgs by navArgs()
 
     // Single Permission Contract
     @SuppressLint("MissingPermission")
@@ -118,6 +121,7 @@ class RiderFragment : Fragment() {
         reqPerm.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
 
+
     }
 
 
@@ -163,16 +167,18 @@ class RiderFragment : Fragment() {
                 val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
 
 
+//generate random UUID for using in deleting the document
+                docID = UUID.randomUUID().toString()
                 //create uberRequest object with 3 arguments
-                val request = UberRequest(geoPoint, isRequestAccepted, Date())
-                Timber.i("originalU-loc $request")
+                val uberRequest = UberRequest(docID,geoPoint, isRequestAccepted, Date())
+                Timber.i("originalU-loc $uberRequest")
                 //save userLocation on firestore
-                firestore.collection("UberRequest")
-                        .add(request)
+                firestore.collection("UberRequest").document(docID).set(uberRequest)
+
                         .addOnSuccessListener {
 
-                            //get the document id for using in deleting the document
-                            docID = it.id
+                            //get the document id
+
                             Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
                                     .show()
                         }.addOnFailureListener {
@@ -254,14 +260,15 @@ class RiderFragment : Fragment() {
 
 
 
+
+
+
         if (isRequestAccepted) {
 
 
-            Snackbar.make(
-                    binding.root,
-                    resources.getString(R.string.driver_on_the_way),
-                    Snackbar.LENGTH_SHORT
-                         ).show()
+            Snackbar.make(binding.root, resources.getString(R.string.driver_on_the_way),
+                    Snackbar.LENGTH_SHORT).show()
+
             //make callUberButton INVISIBLE
             binding.callUberButton.visibility = View.INVISIBLE
         }
@@ -270,11 +277,10 @@ class RiderFragment : Fragment() {
         handler.postDelayed(
 
                 {
-                    Timber.i("postDelayed() Triggered - $docID")
+
 
                     checkForUpdates()
-                }, 5000
-                           )
+                }, 5000)
 
     }
 
@@ -332,8 +338,8 @@ class RiderFragment : Fragment() {
         //CameraUpdateFactory
         val cu = CameraUpdateFactory.newLatLngBounds(bounds, 200)
         map.moveCamera(cu)
-        map.animateCamera(CameraUpdateFactory.zoomTo(11f), 2000, null)
 
+        map.animateCamera(CameraUpdateFactory.zoomTo(17f), 2000, null)
     }
 
 

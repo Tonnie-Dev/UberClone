@@ -23,7 +23,7 @@
         android:label="fragment_rider"
         tools:layout="@layout/fragment_rider">
         <argument
-            android:name="userType"
+            android:name="uid"
             app:argType="string" />
         <action
             android:id="@+id/action_riderFragment_to_loginFragment"
@@ -37,6 +37,8 @@
         <action
             android:id="@+id/action_driverRequestViewFragment_to_driverMapFragment"
             app:destination="@id/driverMapFragment" />
+        <argument android:name="uid"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/driverMapFragment"
