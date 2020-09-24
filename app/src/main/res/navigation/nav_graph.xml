@@ -36,7 +36,8 @@
         tools:layout="@layout/fragment_driver_request_view">
         <action
             android:id="@+id/action_driverRequestViewFragment_to_driverMapFragment"
-            app:destination="@id/driverMapFragment" />
+            app:destination="@id/driverMapFragment"
+            app:popUpTo="@id/loginFragment" />
         <argument android:name="driverDocId "
             app:argType="string" />
     </fragment>
