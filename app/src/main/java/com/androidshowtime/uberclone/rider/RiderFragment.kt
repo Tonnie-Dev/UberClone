@@ -33,12 +33,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Source
 import timber.log.Timber
+import java.math.RoundingMode
 import java.util.*
 
 class RiderFragment : Fragment() {
     //vars
     private lateinit var map: GoogleMap
-    private lateinit var currentLocation: Location
+    private lateinit var currentRiderLocation: Location
     private lateinit var firestore: FirebaseFirestore
     private lateinit var currentUserId: String
     private var isButtonClicked = false
@@ -47,8 +48,9 @@ class RiderFragment : Fragment() {
     private var isRequestAccepted = false
     private lateinit var binding: FragmentRiderBinding
 
+
     //vals
-    private val args:RiderFragmentArgs by navArgs()
+    private val args: RiderFragmentArgs by navArgs()
 
     // Single Permission Contract
     @SuppressLint("MissingPermission")
@@ -59,13 +61,12 @@ class RiderFragment : Fragment() {
 
             //request for Location Updates
             startLocationUpdates()
-        }
-        else {
+        } else {
             Toast.makeText(
-                    activity, "Location Permission Needed",
-                    Toast.LENGTH_SHORT
-                          )
-                    .show()
+                activity, "Location Permission Needed",
+                Toast.LENGTH_SHORT
+            )
+                .show()
         }
 
 
@@ -86,17 +87,16 @@ class RiderFragment : Fragment() {
 
             if (locationResult != null) {
                 //locationResult.locations.forEach { currentLocation = it }
-                currentLocation = locationResult.lastLocation
+                currentRiderLocation = locationResult.lastLocation
                 Timber.i(
-                        "Current Place:  ${currentLocation.latitude}, ${currentLocation.longitude}"
-                        )
+                    "Current Place:  ${currentRiderLocation.latitude}, ${currentRiderLocation.longitude}"
+                )
 
                 //positioning the camera and the marker
-                moveMarkerAndCamera(currentLocation)
+                moveMarkerAndCamera(currentRiderLocation)
 
 
-            }
-            else {
+            } else {
                 //log Location as null
                 Timber.i("Location is null!!!")
                 return
@@ -121,15 +121,14 @@ class RiderFragment : Fragment() {
         reqPerm.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
 
-
     }
 
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-                             ): View? {
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentRiderBinding.inflate(inflater)
         val viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
         binding.viewModel = viewModel
@@ -138,7 +137,7 @@ class RiderFragment : Fragment() {
         handler = Handler(Looper.getMainLooper())
         //initializing the fusedLocationProviderClient
         fusedLocationProviderClient =
-                LocationServices.getFusedLocationProviderClient(requireActivity())
+            LocationServices.getFusedLocationProviderClient(requireActivity())
 
         //initializing locationRequest
         locationRequest = LocationRequest().apply {
@@ -164,27 +163,28 @@ class RiderFragment : Fragment() {
             //Uber Request
             if (!isButtonClicked) {
                 //create Firestore Geopoint variable from currentLocation
-                val geoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
+                val geoPoint =
+                    GeoPoint(currentRiderLocation.latitude, currentRiderLocation.longitude)
 
 
-//generate random UUID for using in deleting the document
+                //generate random UUID for using in deleting the document
                 docID = UUID.randomUUID().toString()
                 //create uberRequest object with 3 arguments
-                val uberRequest = UberRequest(docID,geoPoint, isRequestAccepted, Date())
+                val uberRequest = UberRequest(docID, geoPoint, isRequestAccepted, Date())
                 Timber.i("originalU-loc $uberRequest")
                 //save userLocation on firestore
                 firestore.collection("UberRequest").document(docID).set(uberRequest)
 
-                        .addOnSuccessListener {
+                    .addOnSuccessListener {
 
-                            //get the document id
+                        //get the document id
 
-                            Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
-                                    .show()
-                        }.addOnFailureListener {
+                        Toast.makeText(activity, "Uber Requested", Toast.LENGTH_SHORT)
+                            .show()
+                    }.addOnFailureListener {
 
-                            Timber.i("Error in saving User's location: $it")
-                        }
+                        Timber.i("Error in saving User's location: $it")
+                    }
 
 
                 binding.callUberButton.text = getString(R.string.cancel_uber_request)
@@ -193,11 +193,11 @@ class RiderFragment : Fragment() {
 
                 handler.postDelayed({
 
-                                        Timber.i("postDelayed() Triggered from button")
-                                        //method that we can run after 2 secs
-                                        checkForUpdates()
+                    Timber.i("postDelayed() Triggered from button")
+                    //method that we can run after 2 secs
+                    checkForUpdates()
 
-                                    }, 5000)
+                }, 5000)
             }
             //Uber Request Cancellation
             else {
@@ -205,13 +205,13 @@ class RiderFragment : Fragment() {
 
                 //delete document request from firestore
                 firestore.collection("UberRequest")
-                        .document(docID)
-                        .delete()
-                        .addOnSuccessListener {
+                    .document(docID)
+                    .delete()
+                    .addOnSuccessListener {
 
-                            Timber.i("$docID deleted")
-                            Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
-                        }
+                        Timber.i("$docID deleted")
+                        Toast.makeText(activity, "Request Cancelled", Toast.LENGTH_SHORT).show()
+                    }
 
 
                 binding.callUberButton.text = getString(R.string.request_uber)
@@ -238,25 +238,25 @@ class RiderFragment : Fragment() {
 
         //create a document reference
         val docRef = firestore
-                .collection("UberRequest")
-                .document(docID)
+            .collection("UberRequest")
+            .document(docID)
 
         //use get() to retrieve the document specified by docID variable
         docRef.get(Source.SERVER)
-                .addOnSuccessListener { documentSnapshot ->
-                    //if documentSnapshot is not null read value of isRequestAccepted
-                    if (documentSnapshot != null) {
-                        val uberRequest = documentSnapshot.toObject(UberRequest::class.java)
+            .addOnSuccessListener { documentSnapshot ->
+                //if documentSnapshot is not null read value of isRequestAccepted
+                if (documentSnapshot != null) {
+                    val uberRequest = documentSnapshot.toObject(UberRequest::class.java)
 
-                        //null check on UberRequest object
-                        uberRequest?.let {
-                            //set the value of isAccepted to server's value
-                            isRequestAccepted = uberRequest.accepted
-                        }
+                    //null check on UberRequest object
+                    uberRequest?.let {
+                        //set the value of isAccepted to server's value
+                        isRequestAccepted = uberRequest.accepted
                     }
+                }
 
 
-                }.addOnFailureListener { Timber.i("Document not found") }
+            }.addOnFailureListener { Timber.i("Document not found") }
 
 
 
@@ -266,8 +266,7 @@ class RiderFragment : Fragment() {
         if (isRequestAccepted) {
 
 
-            Snackbar.make(binding.root, resources.getString(R.string.driver_on_the_way),
-                    Snackbar.LENGTH_SHORT).show()
+         showSnackBar()
 
             //make callUberButton INVISIBLE
             binding.callUberButton.visibility = View.INVISIBLE
@@ -276,11 +275,12 @@ class RiderFragment : Fragment() {
         //handler to call checkForUpdates() after every 5 secs
         handler.postDelayed(
 
-                {
+            {
 
 
-                    checkForUpdates()
-                }, 5000)
+                checkForUpdates()
+            }, 5000
+        )
 
     }
 
@@ -296,11 +296,10 @@ class RiderFragment : Fragment() {
     private fun startLocationUpdates() {
         try {
             fusedLocationProviderClient.requestLocationUpdates(
-                    locationRequest, locationCallback,
-                    Looper.getMainLooper()
-                                                              )
-        }
-        catch (e: SecurityException) {
+                locationRequest, locationCallback,
+                Looper.getMainLooper()
+            )
+        } catch (e: SecurityException) {
             //Create a function to request necessary permissions from the app.
 
         }
@@ -324,9 +323,10 @@ class RiderFragment : Fragment() {
 
         //create rider's marker
         val marker = map.addMarker(
-                MarkerOptions().position(currentLatLng)
-                        .title(resources.getString(R.string.rider_marker))
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+            MarkerOptions().position(currentLatLng)
+                .title(resources.getString(R.string.rider_marker))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        )
         //make info window persist on the map
         marker.showInfoWindow()
         builder.include(marker.position)
@@ -340,6 +340,64 @@ class RiderFragment : Fragment() {
         map.moveCamera(cu)
 
         map.animateCamera(CameraUpdateFactory.zoomTo(17f), 2000, null)
+    }
+
+    private fun showSnackBar() {
+
+        val driverLocation = Location("")
+        //get the driver who has accepted the request by filtering with their activationId
+        firestore.collection("Driver")
+            .whereEqualTo("driverActivationId", docID)
+            .get()
+
+
+            .addOnSuccessListener { querySnapshot ->
+
+                Timber.i("Entering  addOnSuccessListener actv ID is $docID ")
+                for (doc in querySnapshot) {
+
+                    Timber.i("Entering  addOnSuccessListener iteration  ")
+                    val geoPoint = doc.getGeoPoint("geoPoint")!!
+                    Timber.i("Geopoint returned is $geoPoint")
+                    driverLocation.apply {
+
+                        latitude = geoPoint.latitude
+                        longitude = geoPoint.longitude
+                    }
+
+
+            val distance =   calculateDistanceBetween(currentRiderLocation, driverLocation)
+
+                    Snackbar.make(
+                        binding.root, "Your Driver is $distance KM Away",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+
+
+                }
+
+                //failure listener
+            }.addOnFailureListener {
+
+                Timber.i("Failure locating a driver - $it")
+            }
+
+        Timber.i(" Final driverLocation is $driverLocation")
+
+
+
+
+    }
+
+
+    fun calculateDistanceBetween(startPoint: Location, endPoint: Location): String {
+
+
+        val distance = startPoint.distanceTo(endPoint) / 1000
+
+
+        return distance.toBigDecimal().setScale(1, RoundingMode.UP).toDouble().toString()
+
     }
 
 
