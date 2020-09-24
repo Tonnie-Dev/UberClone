@@ -59,9 +59,5 @@
             android:name="riderDistanceFromDriver"
             app:argType="integer" />
         <argument android:name="driverDocId " />
-        <action
-            android:id="@+id/action_driverMapFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/loginFragment" />
     </fragment>
 </navigation>

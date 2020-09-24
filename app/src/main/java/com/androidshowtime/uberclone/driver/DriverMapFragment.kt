@@ -139,6 +139,13 @@ class DriverMapFragment : Fragment() {
             userRef.update("requestAccepted", true).addOnSuccessListener {
 
                 Timber.i("update done - $userDocId")
+
+                /*val driverDoc = args.driverDocId
+                val userId = args.userDocId
+
+                val driverRef = firestore.collection("Driver").document(driverDoc)
+
+                driverRef.update("driverActivationId",userDocId )*/
             }.addOnFailureListener {
 
                 Timber.i("update Failed!!")
@@ -148,7 +155,7 @@ class DriverMapFragment : Fragment() {
             driverDocId = args.driverDocId
 
             val driverRef = firestore
-                .collection("Drivers")
+                .collection("Driver")
                 .document(driverDocId)
 
             driverRef.update("driverActivationId", userDocId)
