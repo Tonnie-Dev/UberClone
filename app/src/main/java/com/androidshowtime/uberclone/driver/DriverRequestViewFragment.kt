@@ -139,8 +139,8 @@ class DriverRequestViewFragment : Fragment() {
         //initialize locationRequest
         locationRequest = LocationRequest().apply {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 9000
-            fastestInterval = 8000
+            interval = 6000
+            fastestInterval = 2000
         }
 
 
@@ -333,7 +333,7 @@ class DriverRequestViewFragment : Fragment() {
         return address
     }
 
-   
+
 
 
 
@@ -341,7 +341,7 @@ class DriverRequestViewFragment : Fragment() {
     }
 
 
-}
+
 
 /*  val user: User = Gson().fromJson(requestDocument.get("user").toString(),
                                                     User::class.java)*/

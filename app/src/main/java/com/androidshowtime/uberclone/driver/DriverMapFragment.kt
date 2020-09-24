@@ -102,7 +102,7 @@ class DriverMapFragment : Fragment() {
         //move and animate the camera
 
         map.moveCamera(cu)
-        map.animateCamera(CameraUpdateFactory.zoomTo(13f), 2000, null)
+        map.animateCamera(CameraUpdateFactory.zoomTo(11f), 2000, null)
 
 
         //draw polygon
