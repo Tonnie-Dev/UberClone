@@ -36,7 +36,7 @@ class DriverMapFragment : Fragment() {
     private lateinit var driverLocation: Location
     private var magentaPolyline: Polyline? = null
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var docID: String
+    private lateinit var driverDocId: String
 
 
     private val callback = OnMapReadyCallback { googleMap ->
@@ -58,12 +58,13 @@ class DriverMapFragment : Fragment() {
 
         //rider marker
         val riderMarker = map.addMarker(
-                MarkerOptions().position(riderLatLng)
-                    .title("Rider")
-                    .flat(true)
-                    .snippet(snippet)
+            MarkerOptions().position(riderLatLng)
+                .title("Rider")
+                .flat(true)
+                .snippet(snippet)
 
-                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap)))
+                .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+        )
 
         //show the infoWindow permanently
         riderMarker.showInfoWindow()
@@ -75,11 +76,13 @@ class DriverMapFragment : Fragment() {
 
 
         markers.add(
-                map.addMarker(
-                        MarkerOptions().position(driverLatLng)
-                            .title("Driver")
-                            .snippet("Driver")
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))))
+            map.addMarker(
+                MarkerOptions().position(driverLatLng)
+                    .title("Driver")
+                    .snippet("Driver")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+            )
+        )
 
         //create builder
         val builder = LatLngBounds.builder()
@@ -94,8 +97,6 @@ class DriverMapFragment : Fragment() {
 
         //set a 150 pixels padding from the edge of the screen
         val cu = CameraUpdateFactory.newLatLngBounds(bounds, 150)
-
-
 
 
         //move and animate the camera
@@ -113,12 +114,12 @@ class DriverMapFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-                             ): View? {
+    ): View? {
 
         //create binding
         val binding = FragmentDriverMapBinding.inflate(inflater)
         //retrieve docID
-        val docID = args.docID
+        val userDocId = args.userDocId
         //initialize markers list
         markers = mutableListOf()
 
@@ -130,18 +131,27 @@ class DriverMapFragment : Fragment() {
 
 
             //update the requestAccepted field value in firestore
-            val docRef = firestore
+            val userRef = firestore
                 .collection("UserLocation")
-                .document(docID)
+                .document(userDocId)
 
 
-            docRef.update("requestAccepted", true).addOnSuccessListener {
+            userRef.update("requestAccepted", true).addOnSuccessListener {
 
-                Timber.i("update done - $docID")
+                Timber.i("update done - $userDocId")
             }.addOnFailureListener {
 
                 Timber.i("update Failed!!")
             }
+
+            //Tie driver to the request
+            driverDocId = args.driverDocId
+
+            val driverRef = firestore
+                .collection("Drivers")
+                .document(driverDocId)
+
+            driverRef.update("driverActivationId", userDocId)
 
             /*create the display map parameters to form the map URL(use %2C for URL encoding and escape commas)*/
             val origin = "origin=${driverLocation.latitude}%2C${driverLocation.longitude}&"
@@ -163,8 +173,9 @@ class DriverMapFragment : Fragment() {
             // Verify it resolves
             val activities: List<ResolveInfo> =
                 requireActivity().packageManager.queryIntentActivities(
-                        mapIntent,
-                        PackageManager.MATCH_DEFAULT_ONLY)
+                    mapIntent,
+                    PackageManager.MATCH_DEFAULT_ONLY
+                )
             val isIntentSafe: Boolean = activities.isNotEmpty()
 
             // Start an activity if it's safe

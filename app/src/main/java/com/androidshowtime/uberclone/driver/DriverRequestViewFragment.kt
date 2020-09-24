@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.databinding.FragmentDriverRequestViewBinding
-import com.androidshowtime.uberclone.model.DriverLocation
+import com.androidshowtime.uberclone.model.Driver
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
@@ -35,16 +35,19 @@ class DriverRequestViewFragment : Fragment() {
     private lateinit var requestsLocationList: MutableList<Location>
     private lateinit var distanceList: MutableList<Int>
     private lateinit var documentIdsList: MutableList<String>
+    private  var driverDocId: String =""
+
+
     private var riderDistanceFromDriver: Int = 0
 
     //vals
-    private val args:DriverRequestViewFragmentArgs by navArgs()
+    private val args: DriverRequestViewFragmentArgs by navArgs()
 
     //request location permission
     private val requestLocationPermission = registerForActivityResult(
-            ActivityResultContracts
-                .RequestPermission()
-                                                                     ) {
+        ActivityResultContracts
+            .RequestPermission()
+    ) {
         if (it) {
 
             startLocationUpdates()
@@ -64,22 +67,24 @@ class DriverRequestViewFragment : Fragment() {
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
 
-            if (locationResult != null) {
+            if (locationResult != null&& driverDocId != "") {
 
                 locationResult.locations.forEach { driverCurrentLocation = it }
-                val uid = args.uid
 
-                //save driver's location in firestore
-                val driverLocation = DriverLocation(uid,
-                        GeoPoint(driverCurrentLocation.latitude, driverCurrentLocation.longitude))
-                firestore.collection("DriverLocation")
-                    .add(driverLocation)
+
+                //capture driver's latest geoPoint
+                val newGeoPoint =GeoPoint(driverCurrentLocation.latitude, driverCurrentLocation.longitude)
+
+             val driverRef =   firestore.collection("Driver").document(driverDocId)
+
+                     driverRef.update("geoPoint",newGeoPoint)
                     .addOnSuccessListener {
 
-                        Timber.i("Geopoint saved - $driverLocation")
+
+                        Timber.i("Geopoint updated- $newGeoPoint")
                     }.addOnFailureListener {
 
-                        Timber.i("$it")
+                        Timber.i("Error encountered $it")
                     }
                 getAllRideRequests()
 
@@ -97,17 +102,34 @@ class DriverRequestViewFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-                             ): View? {
+    ): View? {
 
-        //set initial driver's location before the location updates kicks off avoid crashes
+
+        //request permission
+        requestLocationPermission.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+
+        //set initial driver's location before the location updates kicks off to avoid crashes
         val loc = Location("")
         loc.latitude = 0.0
         loc.longitude = 0.0
         driverCurrentLocation = loc
+
+
+
         //initialize firestore
         firestore = FirebaseFirestore.getInstance()
-        //request permission
-        requestLocationPermission.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+        //create a driver object
+
+        val driver = Driver(geoPoint = GeoPoint(driverCurrentLocation.latitude, driverCurrentLocation.longitude))
+
+        //save the initial driver object in the database
+        firestore.collection("Driver").add(driver).addOnSuccessListener {
+
+            driverDocId = it.id
+            Timber.i("Driver Document Saved - $driverDocId")
+        }.addOnFailureListener { Timber.i("Driver Document Creation Failed") }
 
         //initialize fusedLocationProviderClient
         fusedLocationProviderClient =
@@ -135,9 +157,9 @@ class DriverRequestViewFragment : Fragment() {
 
         //initialize Adapter
         adapter = ArrayAdapter<String>(
-                requireActivity(), android.R.layout
-            .simple_list_item_1, requestsList
-                                      )
+            requireActivity(), android.R.layout
+                .simple_list_item_1, requestsList
+        )
 
         binding.listView.adapter = adapter
 
@@ -145,14 +167,15 @@ class DriverRequestViewFragment : Fragment() {
             val userLocation = requestsLocationList[i]
 
             riderDistanceFromDriver = distanceList[i]
-            val documentID = documentIdsList[i]
+            val userDocId = documentIdsList[i]
 
             findNavController().navigate(
 
-                    //insert argument to be passed into DriverMapFrament
-                    DriverRequestViewFragmentDirections
-                        .actionDriverRequestViewFragmentToDriverMapFragment
-                        (userLocation, driverCurrentLocation, documentID, riderDistanceFromDriver))
+                //insert argument to be passed into DriverMapFrament
+                DriverRequestViewFragmentDirections
+                    .actionDriverRequestViewFragmentToDriverMapFragment
+                        (userLocation, driverCurrentLocation, userDocId, riderDistanceFromDriver,driverDocId)
+            )
 
         }
 
@@ -167,10 +190,10 @@ class DriverRequestViewFragment : Fragment() {
 
         try {
             fusedLocationProviderClient.requestLocationUpdates(
-                    locationRequest,
-                    locationCallback,
-                    Looper.getMainLooper()
-                                                              )
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
         } catch (e: SecurityException) {
             //Create a function to request necessary permissions from the app.
 
@@ -195,7 +218,7 @@ class DriverRequestViewFragment : Fragment() {
 
 
                     val geoPoint = document.getGeoPoint("geoPoint")!!
-                 val documentID = document.id
+                    val documentID = document.id
                     //set userLocation latitude and longitude on Location class
                     val userLocation = Location("")
                     userLocation.latitude = geoPoint.latitude
@@ -223,7 +246,7 @@ class DriverRequestViewFragment : Fragment() {
     }
 
 
-    private fun populateListWithRequests(docID:String,userLocation: Location) {
+    private fun populateListWithRequests(docID: String, userLocation: Location) {
 
         //capture user's geoPoint and store in in a list
         requestsLocationList.add(userLocation)
@@ -250,7 +273,7 @@ class DriverRequestViewFragment : Fragment() {
         }
 
 
-        if (requestsList.size <=0){
+        if (requestsList.size <= 0) {
 
             requestsList.add("No Requests Found")
             adapter.notifyDataSetChanged()
@@ -310,9 +333,10 @@ class DriverRequestViewFragment : Fragment() {
         return address
     }
 
-    fun retrieveRiderDocId() {
+   
 
-        
+
+
 
     }
 

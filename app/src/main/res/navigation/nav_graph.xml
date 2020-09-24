@@ -37,7 +37,7 @@
         <action
             android:id="@+id/action_driverRequestViewFragment_to_driverMapFragment"
             app:destination="@id/driverMapFragment" />
-        <argument android:name="uid"
+        <argument android:name="driverDocId "
             app:argType="string" />
     </fragment>
     <fragment
@@ -52,10 +52,11 @@
             android:name="driverLocation"
             app:argType="android.location.Location" />
         <argument
-            android:name="docID"
+            android:name="userDocId"
             app:argType="string" />
         <argument
             android:name="riderDistanceFromDriver"
             app:argType="integer" />
+        <argument android:name="driverDocId " />
     </fragment>
 </navigation>
