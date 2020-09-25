@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
@@ -362,7 +363,7 @@ class RiderFragment : Fragment() {
         val cu = CameraUpdateFactory.newLatLngBounds(bounds, 200)
         map.moveCamera(cu)
 
-      
+
     }
 
     private fun showDriverInfo() {
@@ -372,8 +373,6 @@ class RiderFragment : Fragment() {
         firestore.collection("Driver")
                 .whereEqualTo("driverActivationId", docID)
                 .get()
-
-
                 .addOnSuccessListener { querySnapshot ->
 
                     Timber.i("Entering  addOnSuccessListener actv ID is $docID ")
@@ -417,6 +416,35 @@ class RiderFragment : Fragment() {
 //rounding to one decimal place
         return distance.toBigDecimal().setScale(1, RoundingMode.UP).toDouble()
 
+    }
+
+
+    fun reset() {
+
+
+        //delete the uberRequest
+        firestore.collection("UberRequest").document(docID).delete().addOnSuccessListener {
+
+            Timber.i("UberRequest Deleted")
+        }
+
+        binding.callUberButton.visibility = View.VISIBLE
+        binding.callUberButton.text = getString(R.string.request_uber)
+        isButtonClicked = false
+        binding.infoTextView.visibility = View.INVISIBLE
+showDriverArrivalNotification()
+    }
+
+
+    fun showDriverArrivalNotification() {
+        val materialAlertDialogBuilder =
+            MaterialAlertDialogBuilder(requireContext())
+                    .apply {
+                        setTitle("Driver")
+                        setMessage("Your Driver has Arrived")
+                        setIcon(R.drawable.driver_icon)
+                        setPositiveButton("") { _, _ -> Unit }
+                    }.show()
     }
 
 
