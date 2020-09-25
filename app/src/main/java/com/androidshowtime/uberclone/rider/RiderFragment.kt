@@ -191,13 +191,11 @@ class RiderFragment : Fragment() {
                 isButtonClicked = true
 
 
-                handler.postDelayed({
 
-                    Timber.i("postDelayed() Triggered from button")
                     //method that we can run after 2 secs
                     checkForUpdates()
 
-                }, 5000)
+
             }
             //Uber Request Cancellation
             else {
@@ -266,12 +264,11 @@ class RiderFragment : Fragment() {
         if (isRequestAccepted) {
 
 
-         showSnackBar()
+            showSnackBar()
 
             //make callUberButton INVISIBLE
             binding.callUberButton.visibility = View.INVISIBLE
         }
-
         //handler to call checkForUpdates() after every 5 secs
         handler.postDelayed(
 
@@ -366,12 +363,13 @@ class RiderFragment : Fragment() {
                     }
 
 
-            val distance =   calculateDistanceBetween(currentRiderLocation, driverLocation)
+                    val distance = calculateDistanceBetween(currentRiderLocation, driverLocation)
 
                     Snackbar.make(
                         binding.root, "Your Driver is $distance KM Away",
                         Snackbar.LENGTH_SHORT
-                    ).show()
+                    )
+                    .show()
 
 
                 }
@@ -379,10 +377,8 @@ class RiderFragment : Fragment() {
                 //failure listener
             }.addOnFailureListener {
 
-                Timber.i("Failure locating a driver - $it")
+                Timber.i("Error in locating a driver - $it")
             }
-
-        Timber.i(" Final driverLocation is $driverLocation")
 
 
 
@@ -390,12 +386,12 @@ class RiderFragment : Fragment() {
     }
 
 
-    fun calculateDistanceBetween(startPoint: Location, endPoint: Location): String {
+    private fun calculateDistanceBetween(startPoint: Location, endPoint: Location): String {
 
 
         val distance = startPoint.distanceTo(endPoint) / 1000
 
-
+//rounding to one decimal place
         return distance.toBigDecimal().setScale(1, RoundingMode.UP).toDouble().toString()
 
     }
