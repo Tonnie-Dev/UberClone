@@ -151,6 +151,10 @@ class RiderFragment : Fragment() {
             fastestInterval = 2000
         }
 
+
+
+
+        //showDriverArrivalNotification()
         //initializing Firestore
         firestore = FirebaseFirestore.getInstance()
 
@@ -392,6 +396,11 @@ class RiderFragment : Fragment() {
                             calculateDistanceBetween(currentRiderLocation, driverLocation)
 
 
+                        if (distance<0.2){
+
+                        showDriverArrivalNotification()
+                        }
+
                         infoTextView.text =
                             resources.getString(R.string.driver_on_the_way, distance)
 
@@ -413,6 +422,9 @@ class RiderFragment : Fragment() {
 
         val distance = startPoint.distanceTo(endPoint) / 1000
 
+
+
+
 //rounding to one decimal place
         return distance.toBigDecimal().setScale(1, RoundingMode.UP).toDouble()
 
@@ -432,19 +444,18 @@ class RiderFragment : Fragment() {
         binding.callUberButton.text = getString(R.string.request_uber)
         isButtonClicked = false
         binding.infoTextView.visibility = View.INVISIBLE
-showDriverArrivalNotification()
+
     }
 
 
     fun showDriverArrivalNotification() {
-        val materialAlertDialogBuilder =
-            MaterialAlertDialogBuilder(requireContext())
-                    .apply {
-                        setTitle("Driver")
-                        setMessage("Your Driver has Arrived")
-                        setIcon(R.drawable.driver_icon)
-                        setPositiveButton("") { _, _ -> Unit }
-                    }.show()
+        val materialAlertDialogBuilder = MaterialAlertDialogBuilder(requireContext())
+
+                . setTitle("Driver")
+                .setMessage("Your Driver has Arrived")
+                .setIcon(R.drawable.driver_icon)
+                .setPositiveButton("OK") { _, _ -> reset() }
+                .show()
     }
 
 

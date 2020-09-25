@@ -132,11 +132,11 @@ class DriverMapFragment : Fragment() {
 
             //update the requestAccepted field value in firestore
             val userRef = firestore
-                .collection("UserLocation")
+                .collection("UberRequest")
                 .document(userDocId)
 
 
-            userRef.update("requestAccepted", true).addOnSuccessListener {
+            userRef.update("accepted", true).addOnSuccessListener {
 
                 Timber.i("update done - $userDocId")
 
