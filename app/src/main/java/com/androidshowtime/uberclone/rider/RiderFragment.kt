@@ -362,7 +362,7 @@ class RiderFragment : Fragment() {
         val cu = CameraUpdateFactory.newLatLngBounds(bounds, 200)
         map.moveCamera(cu)
 
-        map.animateCamera(CameraUpdateFactory.zoomTo(17f), 2000, null)
+      
     }
 
     private fun showDriverInfo() {
