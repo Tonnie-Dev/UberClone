@@ -9,7 +9,7 @@
     <string name="cancel_uber_request">Cancel Request</string>
     <string name="log_out">Log Out</string>
     <string name="accept_request">Accept Request</string>
-    <string name="driver_on_the_way">Driver is %s KM away</string>
+    <string name="driver_on_the_way">Driver is %.2f KM away</string>
     <string name="rider_marker">I\'m here</string>
 
 
