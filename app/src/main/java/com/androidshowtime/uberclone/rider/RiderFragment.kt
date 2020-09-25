@@ -146,8 +146,8 @@ class RiderFragment : Fragment() {
 
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 15000
-            fastestInterval = 10000
+            interval = 3000
+            fastestInterval = 2000
         }
 
         //initializing Firestore
