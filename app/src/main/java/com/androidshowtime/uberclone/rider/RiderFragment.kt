@@ -280,8 +280,14 @@ class RiderFragment : Fragment() {
                 //show infoTextView
                 infoTextView.visibility = View.VISIBLE
 
-                //display driver's distance from the rider
-                showDriverInfo()
+
+                handler.postDelayed({
+
+
+                                        //display driver's distance from the rider
+                                        showDriverInfo()
+                                    },3000)
+
 
                 //make callUberButton INVISIBLE
                 binding.callUberButton.visibility = View.INVISIBLE
@@ -290,8 +296,11 @@ class RiderFragment : Fragment() {
             handler.postDelayed(
 
                     {
+
+
+
                         checkForUpdates()
-                    }, 5000)
+                    }, 3000)
 
 
         }
@@ -412,12 +421,12 @@ class RiderFragment : Fragment() {
                                 calculateDistanceBetween(currentRiderLocation, driverLocation)
 
                         //prompt the dialog if the driver is less than 0.1 KM away
-                        if (distance < 0.1) {
+                        if (distance < 0.3) {
 
                             showDriverArrivalNotification()
                         }
 
-//use string resourse to set textView's text
+                        //use string resource to set textView's text
                         infoTextView.text =
                                 resources.getString(R.string.driver_on_the_way, distance)
 
