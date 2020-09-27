@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.androidshowtime.uberclone.R
 import com.androidshowtime.uberclone.databinding.FragmentDriverMapBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -38,6 +40,10 @@ class DriverMapFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var driverDocId: String
 
+    //location components
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var locationRequest:LocationRequest
+
 
     private val callback = OnMapReadyCallback { googleMap ->
 
@@ -58,13 +64,13 @@ class DriverMapFragment : Fragment() {
 
         //rider marker
         val riderMarker = map.addMarker(
-            MarkerOptions().position(riderLatLng)
-                .title("Rider")
-                .flat(true)
-                .snippet(snippet)
+                MarkerOptions().position(riderLatLng)
+                        .title("Rider")
+                        .flat(true)
+                        .snippet(snippet)
 
-                .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
-        )
+                        .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                                       )
 
         //show the infoWindow permanently
         riderMarker.showInfoWindow()
@@ -76,13 +82,13 @@ class DriverMapFragment : Fragment() {
 
 
         markers.add(
-            map.addMarker(
-                MarkerOptions().position(driverLatLng)
-                    .title("Driver")
-                    .snippet("Driver")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-            )
-        )
+                map.addMarker(
+                        MarkerOptions().position(driverLatLng)
+                                .title("Driver")
+                                .snippet("Driver")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                             )
+                   )
 
         //create builder
         val builder = LatLngBounds.builder()
@@ -111,10 +117,10 @@ class DriverMapFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+                             ): View? {
 
         //create binding
         val binding = FragmentDriverMapBinding.inflate(inflater)
@@ -132,8 +138,8 @@ class DriverMapFragment : Fragment() {
 
             //update the requestAccepted field value in firestore
             val userRef = firestore
-                .collection("UberRequest")
-                .document(userDocId)
+                    .collection("UberRequest")
+                    .document(userDocId)
 
 
             userRef.update("accepted", true).addOnSuccessListener {
@@ -155,12 +161,13 @@ class DriverMapFragment : Fragment() {
             driverDocId = args.driverDocId
 
             val driverRef = firestore
-                .collection("Driver")
-                .document(driverDocId)
-
+                    .collection("Driver")
+                    .document(driverDocId)
+            //update requestCode to match rider's code
             driverRef.update("driverActivationId", userDocId)
 
-            /*create the display map parameters to form the map URL(use %2C for URL encoding and escape commas)*/
+            /*create the display map parameters to form the map URL(use %2C for URL encoding and
+            to escape commas)*/
             val origin = "origin=${driverLocation.latitude}%2C${driverLocation.longitude}&"
             val destination = "destination=${riderLocation.latitude}%2C${riderLocation.longitude}&"
             val travelMode = "travelmode=driving"
@@ -179,10 +186,10 @@ class DriverMapFragment : Fragment() {
 
             // Verify it resolves
             val activities: List<ResolveInfo> =
-                requireActivity().packageManager.queryIntentActivities(
-                    mapIntent,
-                    PackageManager.MATCH_DEFAULT_ONLY
-                )
+                    requireActivity().packageManager.queryIntentActivities(
+                            mapIntent,
+                            PackageManager.MATCH_DEFAULT_ONLY
+                                                                          )
             val isIntentSafe: Boolean = activities.isNotEmpty()
 
             // Start an activity if it's safe
