@@ -53,7 +53,6 @@ class RiderFragment : Fragment() {
     private var locationForDriver: Location? = null
 
 
-
     //vals
     private val args: RiderFragmentArgs by navArgs()
 
@@ -167,7 +166,7 @@ class RiderFragment : Fragment() {
 
         //Call Uber Button implementation
         binding.callUberButton.setOnClickListener {
-requestUpdates = true
+            requestUpdates = true
             startLocationUpdates()
 
             //Uber Request
@@ -385,6 +384,7 @@ requestUpdates = true
 
     }
 
+    //show how far the driver is
     private fun showDriverInfo() {
 
         val driverLocation = Location("")
@@ -394,12 +394,13 @@ requestUpdates = true
                 .get()
                 .addOnSuccessListener { querySnapshot ->
 
-                    Timber.i("Entering  addOnSuccessListener actv ID is $docID ")
+
                     for (doc in querySnapshot) {
 
-                        Timber.i("Entering  addOnSuccessListener iteration  ")
+
                         val geoPoint = doc.getGeoPoint("geoPoint")!!
-                        Timber.i("Geopoint returned is $geoPoint")
+
+                        //set the returned geoPoint as the driver's location
                         driverLocation.apply {
 
                             latitude = geoPoint.latitude
@@ -410,12 +411,13 @@ requestUpdates = true
                         val distance =
                                 calculateDistanceBetween(currentRiderLocation, driverLocation)
 
-
-                        if (distance < 0.2) {
+                        //prompt the dialog if the driver is less than 0.1 KM away
+                        if (distance < 0.1) {
 
                             showDriverArrivalNotification()
                         }
 
+//use string resourse to set textView's text
                         infoTextView.text =
                                 resources.getString(R.string.driver_on_the_way, distance)
 
@@ -448,6 +450,7 @@ requestUpdates = true
 
         //set requestUpdates to stop handler running again
         requestUpdates = false
+        isRequestAccepted = false
         //delete the previous uberRequest
         firestore.collection("UberRequest").document(docID).delete().addOnSuccessListener {
 
