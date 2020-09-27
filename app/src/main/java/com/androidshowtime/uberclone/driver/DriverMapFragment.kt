@@ -54,16 +54,11 @@ class DriverMapFragment : Fragment() {
             if (locationResult != null) {
                 driverLocation = locationResult.lastLocation
 
-                //obtain Geopoint from driver's location
-                val driverGeoPoint = GeoPoint(driverLocation.latitude, driverLocation.longitude)
 
 
-                //update location on firestore
-                val driverRef = firestore.collection("Driver").document(driverDocId)
+              //update driver location on firestore
 
-                driverRef.update("geoPoint", driverGeoPoint)
-                        .addOnSuccessListener { Timber.i("Driver's location updated on firestore") }
-                        .addOnFailureListener { Timber.i("Error $it") }
+              updateDriverLocationOnFirestore()
 
             }
 
@@ -164,8 +159,11 @@ class DriverMapFragment : Fragment() {
 
         //create binding
         val binding = FragmentDriverMapBinding.inflate(inflater)
+                //obtain driverDocId from navigation arguments
+        driverDocId = args.driverDocId
+//initialize firestore
 
-
+        firestore = FirebaseFirestore.getInstance()
         //retrieve docID
         val userDocId = args.userDocId
         //initialize markers list
@@ -185,7 +183,6 @@ class DriverMapFragment : Fragment() {
         //acceptButton onClick implementation
         binding.acceptButton.setOnClickListener {
 
-            firestore = FirebaseFirestore.getInstance()
 
 
             //update rider's requestAccepted field value in firestore
@@ -203,9 +200,9 @@ class DriverMapFragment : Fragment() {
                 Timber.i("Rider's request acceptance failed - $it")
             }
 
-            //Tie driver to the rider's request
-            driverDocId = args.driverDocId
 
+
+            //Tie driver to the rider's request
             val driverRef = firestore
                     .collection("Driver")
                     .document(driverDocId)
@@ -254,24 +251,18 @@ class DriverMapFragment : Fragment() {
         mapFragment?.getMapAsync(callback)
     }
 
-
+//draw polyline using polylineOptions
     private fun showPath(latLngList: MutableList<LatLng>) {
-
-
         val polylineOptions = PolylineOptions()
         polylineOptions.color(Color.MAGENTA)
         polylineOptions.width(3f)
         polylineOptions.addAll(latLngList)
-        magentaPolyline?.tag = "A"
-
-        magentaPolyline?.isClickable = true
         magentaPolyline = map.addPolyline(polylineOptions)
-
 
     }
 
-
-    fun startLocationUpdates() {
+//start updates
+    private fun startLocationUpdates() {
 
 
         try {
@@ -288,4 +279,16 @@ class DriverMapFragment : Fragment() {
     }
 
 
+    fun updateDriverLocationOnFirestore() {
+
+        //obtain Geopoint from driver's location
+        val driverGeoPoint = GeoPoint(driverLocation.latitude, driverLocation.longitude)
+
+        //update location on firestore
+        val driverRef = firestore.collection("Driver").document(driverDocId)
+
+        driverRef.update("geoPoint", driverGeoPoint)
+                .addOnSuccessListener { Timber.i("Driver's location updated on firestore") }
+                .addOnFailureListener { Timber.i("Error $it") }
+    }
 }
