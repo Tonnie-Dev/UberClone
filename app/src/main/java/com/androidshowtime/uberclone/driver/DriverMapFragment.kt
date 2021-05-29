@@ -142,7 +142,8 @@ class DriverMapFragment : Fragment() {
 
 
         //move and animate the camera
-        map.moveCamera(cu)
+        map.moveCamera(CameraUpdateFactory.newLatLng(LatLng(0.0,0.0)))
+
         map.animateCamera(CameraUpdateFactory.zoomTo(11f), 2000, null)
 
 

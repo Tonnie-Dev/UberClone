@@ -1,6 +1,7 @@
 package com.androidshowtime.uberclone.driver
 
 
+import android.app.Fragment
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
@@ -134,6 +135,8 @@ class DriverRequestViewFragment : Fragment() {
         //initialize fusedLocationProviderClient
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        val bill = {name: String -> print(name)}
 
 
         //initialize locationRequest
